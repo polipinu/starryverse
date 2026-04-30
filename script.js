@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Check if the email is verified
                     if (!userCredential.user.emailVerified) {
                         await signOut(auth); // Log them back out immediately
-                        alert("Please check your email and verify your account before logging in.");
+                        alert("Please check your email and verify your account before logging in. (Be sure to check your spam or junk folder if you can't find it!)");
                         return;
                     }
 
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     await signOut(auth);
                     
                     localStorage.setItem('starryverse_device_registered', 'true');
-                    alert("Registration successful! We have sent a verification link to your email. Please verify before logging in.");
+                    alert("Registration successful! We have sent a verification link to your email. Please verify before logging in. (Be sure to check your spam or junk folder if you can't find it!)");
                     closeModal();
                 }
             } catch (error) {
