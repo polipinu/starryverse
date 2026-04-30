@@ -115,7 +115,7 @@ a {
     color: var(--primary);
 }
 
-/* NEW: Gems Pill UI (Blue Gradient Border Update) */
+/* NEW: Gems Pill UI (Blue Gradient Border) */
 .gems-pill-ui {
     display: flex;
     align-items: center;
