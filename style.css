@@ -105,16 +105,39 @@ a {
 }
 
 .nav-link {
+    display: flex;
+    align-items: center;
     color: var(--text-muted);
     font-weight: 600;
-    font-size: 15px;
-    transition: color 0.2s;
+    font-size: 14px; /* Slightly smaller to fit icons nicely */
+    transition: all 0.2s;
+}
+
+.nav-link i {
+    font-size: 16px;
+    opacity: 0.8;
 }
 
 .nav-link:hover {
     color: var(--primary);
 }
 
+.nav-link:hover i {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Ensure the navbar pill doesn't wrap on smaller screens */
+.navbar-pill {
+    white-space: nowrap;
+    overflow-x: auto;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.navbar-pill::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+}
 .gems-pill-ui {
     display: flex;
     align-items: center;
