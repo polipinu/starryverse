@@ -3,568 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zoombies.lol | Create Your Ultimate Web Game</title>
+    <title>Starryverse | Create Your Ultimate Web Game</title>
     <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --bg-dark: #0b1121; 
-            --bg-card: #151e32; 
-            --bg-card-hover: #1e293b;
-            --primary-blue: #3b82f6; 
-            --primary-hover: #60a5fa;
-            --accent-glow: rgba(59, 130, 246, 0.4);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #1e293b;
-            --warning-bg: #f59e0b;
-            --warning-text: #451a03;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Cabin', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .top-banner {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background-color: var(--warning-bg);
-            color: var(--warning-text);
-            text-align: center;
-            padding: 8px 20px;
-            font-size: 14px;
-            font-weight: 700;
-            z-index: 1001;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .navbar {
-            position: fixed;
-            top: 36px;
-            width: 100%;
-            background-color: rgba(11, 17, 33, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 5%;
-            z-index: 1000;
-        }
-
-        .logo img {
-            height: 45px;
-            object-fit: contain;
-            display: block;
-            transition: transform 0.3s ease;
-        }
-
-        .logo img:hover {
-            transform: scale(1.05);
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-
-        .nav-link {
-            color: var(--text-muted);
-            font-size: 16px;
-            font-weight: 600;
-            transition: color 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-
-        .nav-link:hover {
-            color: var(--text-main);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-blue);
-            color: white;
-            box-shadow: 0 4px 15px var(--accent-glow);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px var(--accent-glow);
-        }
-
-        .btn-secondary {
-            background-color: transparent;
-            border: 2px solid var(--primary-blue);
-            color: var(--primary-blue);
-        }
-
-        .btn-secondary:hover {
-            background-color: rgba(59, 130, 246, 0.1);
-            color: white;
-            border-color: var(--primary-hover);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .hero-wrapper {
-            position: relative;
-            margin-top: 110px;
-            overflow: hidden;
-        }
-
-        .hero-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: -1;
-            opacity: 0.5;
-            animation: panGrid 20s linear infinite;
-        }
-
-        @keyframes panGrid {
-            0% { background-position: 0 0; }
-            100% { background-position: 40px 40px; }
-        }
-
-        .hero {
-            padding: 100px 0;
-            display: flex;
-            align-items: center;
-            gap: 60px;
-        }
-
-        .hero-content {
-            flex: 1;
-        }
-
-        .hero-content h1 {
-            font-size: 56px;
-            font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            color: white;
-        }
-
-        .hero-content h1 span {
-            color: var(--primary-blue);
-        }
-
-        .hero-content p {
-            color: var(--text-muted);
-            font-size: 20px;
-            margin-bottom: 40px;
-            max-width: 95%;
-        }
-
-        .hero-image {
-            flex: 1;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .hero-image img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .services {
-            padding: 100px 0;
-            background-color: var(--bg-dark);
-            position: relative;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 38px;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-
-        .section-subtitle {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 18px;
-            margin-bottom: 60px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            margin-bottom: 60px;
-        }
-
-        .service-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 40px 30px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .service-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--primary-blue);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.3s ease;
-        }
-
-        .service-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-        }
-
-        .service-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .service-icon {
-            font-size: 36px;
-            color: var(--primary-blue);
-            margin-bottom: 25px;
-            background: rgba(59, 130, 246, 0.1);
-            width: 70px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 16px;
-        }
-
-        .service-card h3 {
-            font-size: 22px;
-            margin-bottom: 15px;
-            color: white;
-        }
-
-        .service-card p {
-            color: var(--text-muted);
-            font-size: 16px;
-        }
-
-        .editor-showcase {
-            background: var(--bg-card);
-            border-radius: 20px;
-            padding: 40px;
-            border: 1px solid var(--border-color);
-            text-align: center;
-        }
-
-        .editor-showcase h3 {
-            font-size: 28px;
-            margin-bottom: 30px;
-        }
-
-        .full-width-image {
-            width: 100%;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid var(--border-color);
-        }
-
-        .full-width-image img {
-            width: 100%;
-            display: block;
-            transition: transform 0.5s ease;
-        }
-
-        .full-width-image:hover img {
-            transform: scale(1.02);
-        }
-
-        .cta {
-            padding: 100px 0;
-            text-align: center;
-            background: linear-gradient(180deg, var(--bg-dark) 0%, #0d152a 100%);
-            border-top: 1px solid var(--border-color);
-        }
-
-        .cta h2 {
-            font-size: 42px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .cta p {
-            color: var(--text-muted);
-            font-size: 22px;
-            margin-bottom: 50px;
-        }
-
-        .cta-img-wrapper {
-            max-width: 900px;
-            margin: 0 auto 50px auto;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-
-        .cta-img-wrapper img {
-            width: 100%;
-            display: block;
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            border-top: 1px solid var(--border-color);
-            background-color: #080c17;
-            color: var(--text-muted);
-            font-size: 15px;
-        }
-
-        .footer-links {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .footer-links a {
-            transition: color 0.2s;
-        }
-
-        .footer-links a:hover {
-            color: var(--primary-blue);
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 40px;
-            width: 90%;
-            max-width: 400px;
-            position: relative;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-        }
-
-        .modal-overlay.active .modal-content {
-            transform: translateY(0);
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 24px;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .close-btn:hover {
-            color: white;
-        }
-
-        .modal-content h2 {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .social-btn {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            border: none;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            color: white;
-            transition: transform 0.2s, opacity 0.2s;
-        }
-
-        .social-btn:hover {
-            transform: translateY(-2px);
-            opacity: 0.9;
-        }
-
-        .btn-google { background-color: #ea4335; }
-        .btn-discord { background-color: #5865F2; }
-        .btn-apple { background-color: #000000; border: 1px solid #333; }
-
-        .divider {
-            text-align: center;
-            margin: 20px 0;
-            position: relative;
-        }
-
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background-color: var(--border-color);
-        }
-
-        .divider span {
-            background-color: var(--bg-card);
-            padding: 0 10px;
-            color: var(--text-muted);
-            font-size: 12px;
-            position: relative;
-        }
-
-        .auth-form input {
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-dark);
-            color: white;
-            font-size: 15px;
-        }
-
-        .auth-form input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-        }
-
-        .auth-form .btn {
-            width: 100%;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        .fade-in-up {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .fade-in-up.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        @media (max-width: 992px) {
-            .hero {
-                flex-direction: column;
-                text-align: center;
-                padding: 60px 0;
-            }
-            .hero-content h1 {
-                font-size: 42px;
-            }
-            .hero-content p {
-                margin: 0 auto 30px auto;
-            }
-            .hero-content div {
-                justify-content: center;
-            }
-            .services-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .nav-links {
-                display: none;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
-            .cta h2 {
-                font-size: 32px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -572,18 +14,25 @@
         <i class="fa-solid fa-triangle-exclamation"></i> This is a work in progress currently
     </div>
 
-    <nav class="navbar">
-        <div class="logo">
-            <a href="#">
-                <img src="logo.png" alt="Zoombies.lol" onerror="this.src='https://via.placeholder.com/150x40/151e32/3b82f6?text=Zoombies.lol'">
-            </a>
-        </div>
-        <div class="nav-links">
-            <a href="https://www.zoombies.lol/editor" class="nav-link"><i class="fa-solid fa-hammer"></i> Editor</a>
-            <a href="#" class="nav-link"><i class="fa-brands fa-github"></i> GitHub</a>
-            <a class="nav-link" onclick="openModal()"><i class="fa-solid fa-user"></i> Accounts</a>
-            <a href="mailto:zoombies-lol@gmail.com" class="nav-link"><i class="fa-solid fa-envelope"></i> Email Us</a>
-            <a href="https://www.zoombies.lol/play/zoombiesio" class="btn btn-primary"><i class="fa-solid fa-play"></i> Play Game</a>
+    <nav class="navbar-wrapper">
+        <div class="navbar-pill">
+            <div class="logo">
+                <a href="#">
+                    <svg width="180" height="40" viewBox="0 0 180 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="20" cy="20" r="12" fill="#3b82f6"/>
+                        <path d="M20 12L22 18H28L23 21L25 27L20 23L15 27L17 21L12 18H18L20 12Z" fill="white"/>
+                        <!-- Text uses a CSS class to adapt to light/dark mode -->
+                        <text x="40" y="28" font-family="Cabin" font-weight="700" font-size="22" class="svg-text">Starryverse</text>
+                    </svg>
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="https://starryverse.site/editor" class="nav-link">Editor</a>
+                <a href="#" class="nav-link">GitHub</a>
+                <a href="javascript:void(0)" class="nav-link" onclick="openModal()">Account</a>
+                <a href="mailto:starryversesite@outlook.com" class="nav-link">Contact</a>
+                <a href="https://starryverse.site/play/zoombiesio" class="btn-pill btn-primary">Play Now</a>
+            </div>
         </div>
     </nav>
 
@@ -591,149 +40,106 @@
         <div class="hero-bg"></div>
         <section class="container hero fade-in-up">
             <div class="hero-content">
-                <h1>Create your Ultimate <span>Web Game</span></h1>
-                <p>Dive into Zoombies.lol and unleash your creativity with our powerful web-based game editor. Build, customize, and share your unique survival worlds with an enthusiastic community. No coding required.</p>
-                <div style="display: flex; gap: 15px;">
-                    <a href="https://www.zoombies.lol/play/zoombiesio" class="btn btn-primary"><i class="fa-solid fa-gamepad"></i> Play Now</a>
-                    <a href="https://www.zoombies.lol/editor" class="btn btn-secondary"><i class="fa-solid fa-code"></i> Open Editor</a>
+                <div class="badge-pill">v1.0 Rebrand</div>
+                <h1>Build the <span>Starryverse</span></h1>
+                <p>Unleash your creativity with our powerful web-based game editor. Build, customize, and share unique survival worlds with a global community.</p>
+                <div class="btn-group">
+                    <a href="https://starryverse.site/play/zoombiesio" class="btn-pill btn-primary">Launch Game</a>
+                    <a href="https://starryverse.site/editor" class="btn-pill btn-secondary">Open Editor</a>
                 </div>
             </div>
-            <div class="hero-image">
-                <img src="main page.png" alt="Zoombies Main Page" onerror="this.src='https://via.placeholder.com/800x500/1e293b/94a3b8?text=main+page.png'">
+            <div class="hero-image-pill">
+                <img src="assets/main page.png" alt="Starryverse Interface">
             </div>
         </section>
     </div>
 
     <section class="services">
-        <div class="container fade-in-up">
-            <h2 class="section-title">Zoombies.lol Game Editor</h2>
-            <p class="section-subtitle">Everything you need to bring your apocalyptic visions to life right in your browser.</p>
-            
-            <div class="services-grid">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fa-solid fa-layer-group"></i>
-                    </div>
-                    <h3>Interface Customization</h3>
-                    <p>Create intuitive and attractive UI elements to improve player interaction. Design custom health bars, inventory slots, and scoreboards.</p>
-                </div>
-
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fa-solid fa-wrench"></i>
-                    </div>
-                    <h3>Custom Game Modding</h3>
-                    <p>Tailor game mechanics, tweak zombie stats, and spawn completely custom weapons to create unique gameplay experiences.</p>
-                </div>
-
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fa-solid fa-globe"></i>
-                    </div>
-                    <h3>Instant Multiplayer</h3>
-                    <p>Hit publish and instantly play with friends. We handle the servers and networking so you can focus purely on the fun.</p>
-                </div>
-            </div>
-
-            <div class="editor-showcase fade-in-up">
-                <h3>Powerful Map Building Tools</h3>
-                <div class="full-width-image">
-                    <img src="editor map UI.png" alt="Editor Map UI" onerror="this.src='https://via.placeholder.com/1200x600/1e293b/94a3b8?text=editor+map+UI.png'">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="cta fade-in-up">
         <div class="container">
-            <h2>Create worlds, inspire players, unleash your imagination.</h2>
-            <p>Start building your game today!</p>
-            
-            <div class="cta-img-wrapper">
-                <img src="image.png" alt="Zoombies Gameplay" onerror="this.src='https://via.placeholder.com/800x450/1e293b/94a3b8?text=image.png'">
+            <div class="services-grid">
+                <div class="service-card-pill fade-in-up">
+                    <div class="icon-circle"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <h3>UI Designer</h3>
+                    <p>Design custom health bars and inventory slots with our drag-and-drop interface.</p>
+                </div>
+                <div class="service-card-pill fade-in-up">
+                    <div class="icon-circle"><i class="fa-solid fa-microchip"></i></div>
+                    <h3>Logic Engine</h3>
+                    <p>Tailor mechanics and tweak entity stats without writing a single line of complex code.</p>
+                </div>
+                <div class="service-card-pill fade-in-up">
+                    <div class="icon-circle"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                    <h3>Live Publishing</h3>
+                    <p>One-click publishing to our cloud servers. Play with friends instantly.</p>
+                </div>
             </div>
-
-            <a href="https://www.zoombies.lol/editor" class="btn btn-primary" style="font-size: 18px; padding: 16px 36px;">
-                <i class="fa-solid fa-rocket"></i> Start Building Now
-            </a>
         </div>
     </section>
 
-    <footer>
-        <div class="footer-links">
-            <a href="https://www.zoombies.lol/play/zoombiesio">Play</a>
-            <a href="https://www.zoombies.lol/editor">Editor</a>
-            <a href="#">GitHub</a>
-            <a href="mailto:zoombies-lol@gmail.com">Contact Us</a>
+    <!-- NEW ADVANCED FEATURES SECTION -->
+    <section class="advanced-features container">
+        <h2 class="section-title fade-in-up">Powerful Engine Features</h2>
+        <p class="section-subtitle fade-in-up">Everything you need to manage and scale your game effortlessly.</p>
+        
+        <div class="features-grid-extended">
+            <div class="feature-ext-card fade-in-up">
+                <i class="fa-solid fa-floppy-disk feature-icon"></i>
+                <h3>Data Saving Management</h3>
+                <p>Built-in persistent databases. Automatically save player inventories, high scores, and world states to the cloud securely without writing backend APIs.</p>
+            </div>
+            <div class="feature-ext-card fade-in-up">
+                <i class="fa-solid fa-desktop feature-icon"></i>
+                <h3>Live Preview Integration</h3>
+                <p>See your changes in real-time. Test gameplay logic, map layouts, and UI designs instantly in the built-in emulator before pushing updates live.</p>
+            </div>
+            <div class="feature-ext-card fade-in-up">
+                <i class="fa-solid fa-server feature-icon"></i>
+                <h3>Server Management</h3>
+                <p>Deploy custom instances and dedicated servers with one click. Manage active player counts, monitor server health, and adjust tick rates on the fly.</p>
+            </div>
+            <div class="feature-ext-card fade-in-up">
+                <i class="fa-solid fa-palette feature-icon"></i>
+                <h3>Custom Theme Choices</h3>
+                <p>Tailor the workspace to your preference. Auto-detects system preferences, or manually toggle between deep-space dark mode and clean light mode UI.</p>
+            </div>
         </div>
-        <p>&copy; 2026 Zoombies.lol. Built for creators.</p>
+    </section>
+
+    <section class="showcase-section container fade-in-up">
+        <div class="editor-pill-box">
+            <img src="assets/editor map UI.png" alt="Map Editor">
+        </div>
+    </section>
+
+    <footer class="footer-pill-container">
+        <div class="footer-pill">
+            <div class="footer-links">
+                <a href="https://starryverse.site/play/zoombiesio">Play</a>
+                <a href="https://starryverse.site/editor">Editor</a>
+                <a href="mailto:starryversesite@outlook.com">Support</a>
+            </div>
+            <p>&copy; 2026 Starryverse</p>
+        </div>
     </footer>
 
+    <!-- Auth Modal (Fixed Positioning) -->
     <div class="modal-overlay" id="authModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h2>Sign In</h2>
-            
-            <button class="social-btn btn-google" onclick="showWipAlert()">
-                <i class="fa-brands fa-google"></i> Continue with Google
-            </button>
-            <button class="social-btn btn-discord" onclick="showWipAlert()">
-                <i class="fa-brands fa-discord"></i> Continue with Discord
-            </button>
-            <button class="social-btn btn-apple" onclick="showWipAlert()">
-                <i class="fa-brands fa-apple"></i> Continue with Apple
-            </button>
-
-            <div class="divider">
-                <span>OR</span>
+        <div class="modal-content-pill">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <h2 class="modal-title">Welcome Back</h2>
+            <div class="auth-options">
+                <button class="social-pill btn-google" onclick="showWipAlert()"><i class="fa-brands fa-google"></i> Continue with Google</button>
+                <button class="social-pill btn-discord" onclick="showWipAlert()"><i class="fa-brands fa-discord"></i> Continue with Discord</button>
             </div>
-
+            <div class="divider"><span>OR</span></div>
             <form class="auth-form" onsubmit="showWipAlert(); return false;">
-                <input type="text" placeholder="Username or Email" required>
+                <input type="email" placeholder="Email Address" required>
                 <input type="password" placeholder="Password" required>
-                <button type="submit" class="btn btn-primary">Login with Email</button>
+                <button type="submit" class="btn-pill btn-primary full-width" style="margin-top: 10px;">Sign In</button>
             </form>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.1
-            };
-
-            const observer = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        observer.unobserve(entry.target); 
-                    }
-                });
-            }, observerOptions);
-
-            const elementsToAnimate = document.querySelectorAll('.fade-in-up');
-            elementsToAnimate.forEach(el => observer.observe(el));
-        });
-
-        function openModal() {
-            document.getElementById('authModal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('authModal').classList.remove('active');
-        }
-
-        function showWipAlert() {
-            alert("Work in progress");
-        }
-
-        document.getElementById('authModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
