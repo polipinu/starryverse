@@ -31,19 +31,16 @@
                 
                 <a href="#" class="nav-link" id="accountNavBtn">Account</a>
 
-                <!-- NEW: Gems Pill UI -->
                 <div id="gemsPill" class="gems-pill-ui" style="display: none;">
                     <img src="assets/gem.png" alt="Gems">
                     <span id="gemCountDisplay">0</span>
                 </div>
 
-                <!-- Logged In User Pill UI -->
                 <div id="userPill" class="user-pill-ui" style="display: none;">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg" id="userAvatar" alt="Avatar">
                     <span id="userNameDisplay">User</span>
                     <i class="fa-solid fa-chevron-down dropdown-icon"></i>
                     <div id="userDropdown" class="dropdown-menu">
-                        <!-- NEW: Change Avatar Option -->
                         <a href="#" id="changeAvatarNavBtn" class="dropdown-link">
                             <i class="fa-solid fa-image"></i> Change Avatar
                         </a>
@@ -165,11 +162,11 @@
         </div>
     </div>
 
-    <!-- NEW: Avatar Selection Modal -->
+    <!-- NEW: Avatar URL Modal -->
     <div class="modal-overlay" id="avatarModal">
         <div class="modal-content-pill">
             <button class="close-btn" id="closeAvatarModalBtn">&times;</button>
-            <h2 class="modal-title">Choose Profile Picture</h2>
+            <h2 class="modal-title">Profile Picture</h2>
             
             <div class="avatar-grid" id="avatarGrid">
                 <!-- 5 Default Options -->
@@ -180,13 +177,20 @@
                 <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Smile" class="avatar-option" data-url="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Smile" alt="Default 5">
             </div>
 
-            <div class="divider"><span>OR</span></div>
+            <div class="divider"><span>OR CUSTOM LINK</span></div>
             
-            <input type="file" id="customAvatarInput" accept="image/*" style="display: none;">
-            <button class="btn-pill btn-secondary full-width" id="uploadAvatarBtn"><i class="fa-solid fa-upload"></i> Upload Custom Image</button>
+            <!-- User Restraint Explanation UI -->
+            <div style="background: rgba(59, 130, 246, 0.1); border-left: 3px solid var(--primary); padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; color: var(--text-muted); line-height: 1.4;">
+                <i class="fa-solid fa-circle-info" style="color: var(--primary);"></i> <b>Temporary Workaround:</b> Direct file uploads are currently paused for server upgrades. Please paste a direct image link from an external host (e.g., ImgBB, Imgur, or Discord).
+            </div>
+            
+            <!-- URL Input and Preview Button -->
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="url" id="customAvatarUrlInput" placeholder="https://..." style="flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none;">
+                <button class="btn-pill btn-secondary" id="previewUrlBtn">Preview</button>
+            </div>
             
             <div id="avatarPreviewContainer" style="text-align: center; margin-top: 15px; display: none;">
-                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 5px;">Custom Preview:</p>
                 <img id="avatarPreview" src="" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); box-shadow: 0 0 10px var(--accent-glow);">
             </div>
             

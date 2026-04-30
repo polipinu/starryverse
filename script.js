@@ -1,4 +1,4 @@
-// Import the functions you need from the SDKs (Notice: Storage is completely removed!)
+// Import the functions you need from the SDKs (No Storage needed)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
 import { 
@@ -17,7 +17,6 @@ import {
     doc, 
     setDoc, 
     getDoc,
-    updateDoc,
     collection, 
     query, 
     where, 
@@ -35,7 +34,7 @@ const firebaseConfig = {
     measurementId: "G-EWXBVFJ47Q"
 };
 
-// Initialize Firebase & Firestore
+// Initialize Firebase services
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
@@ -104,8 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const changeAvatarNavBtn = document.getElementById('changeAvatarNavBtn');
     const closeAvatarModalBtn = document.getElementById('closeAvatarModalBtn');
     const avatarOptions = document.querySelectorAll('.avatar-option');
-    const customAvatarInput = document.getElementById('customAvatarInput');
-    const uploadAvatarBtn = document.getElementById('uploadAvatarBtn');
+    
+    // NEW: URL Elements
+    const customAvatarUrlInput = document.getElementById('customAvatarUrlInput');
+    const previewUrlBtn = document.getElementById('previewUrlBtn');
     const saveAvatarBtn = document.getElementById('saveAvatarBtn');
     const avatarPreviewContainer = document.getElementById('avatarPreviewContainer');
     const avatarPreview = document.getElementById('avatarPreview');
@@ -135,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('click', (event) => {
         if (event.target === authModal) closeModal(authModal);
         if (event.target === avatarModal) closeModal(avatarModal);
-        
         if (userDropdown && userDropdown.classList.contains('show') && userPill && !userPill.contains(event.target)) {
             userDropdown.classList.remove('show');
             userPill.classList.remove('active');
@@ -150,88 +150,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Avatar Changing System (100% Free Base64 Hack) ---
+    // --- Avatar Changing System (URL Workaround) ---
     let selectedAvatarUrl = DEFAULT_PFP;
 
+    // Handle Default Clicks
     avatarOptions.forEach(opt => {
         opt.addEventListener('click', (e) => {
             avatarOptions.forEach(o => o.classList.remove('selected'));
             e.target.classList.add('selected');
             selectedAvatarUrl = e.target.getAttribute('data-url');
             avatarPreviewContainer.style.display = 'none';
+            customAvatarUrlInput.value = ''; // Clear text field if they click a default
         });
     });
 
-    uploadAvatarBtn.addEventListener('click', (e) => {
+    // Handle Custom URL Preview
+    previewUrlBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        customAvatarInput.click();
-    });
+        const url = customAvatarUrlInput.value.trim();
 
-    // Handle Custom File Upload & Compress it to save database space
-    customAvatarInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const originalText = uploadAvatarBtn.innerHTML;
-        uploadAvatarBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing Image...';
-        uploadAvatarBtn.disabled = true;
-
-        try {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const img = new Image();
-                img.onload = function() {
-                    // Create an invisible canvas to resize the image
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 200; // Small size fits safely in Firestore
-                    const MAX_HEIGHT = 200;
-                    let width = img.width;
-                    let height = img.height;
-
-                    // Calculate aspect ratio mathematically
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-
-                    // Draw the resized image onto the canvas
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // Convert the canvas drawing into a compressed JPEG text string (0.7 quality)
-                    const base64String = canvas.toDataURL('image/jpeg', 0.7);
-
-                    // Update UI and variables
-                    selectedAvatarUrl = base64String;
-                    avatarOptions.forEach(o => o.classList.remove('selected'));
-                    avatarPreview.src = base64String;
-                    avatarPreviewContainer.style.display = 'block';
-
-                    uploadAvatarBtn.innerHTML = originalText;
-                    uploadAvatarBtn.disabled = false;
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-
-        } catch (error) {
-            alert("Image processing failed: " + error.message);
-            uploadAvatarBtn.innerHTML = originalText;
-            uploadAvatarBtn.disabled = false;
+        if(!url.startsWith('http')) {
+            alert("Please enter a valid image link starting with http:// or https://");
+            return;
         }
+
+        // Unselect default options visually
+        avatarOptions.forEach(o => o.classList.remove('selected'));
+
+        selectedAvatarUrl = url;
+        avatarPreview.src = url;
+        avatarPreviewContainer.style.display = 'block';
     });
 
-    // Save final avatar choice to Free Database
+    // Save final choice to Auth and Firestore
     saveAvatarBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         if(!auth.currentUser) return;
@@ -242,10 +193,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await updateProfile(auth.currentUser, { photoURL: selectedAvatarUrl });
             
-            // Save the Base64 string directly to the user's document in Firestore
-            await updateDoc(doc(db, "usernames", auth.currentUser.uid), {
+            // Using setDoc with merge so it never crashes if the document is missing
+            await setDoc(doc(db, "usernames", auth.currentUser.uid), {
                 avatar: selectedAvatarUrl
-            });
+            }, { merge: true });
 
             document.getElementById('userAvatar').src = selectedAvatarUrl;
             closeModal(avatarModal);
@@ -257,7 +208,6 @@ document.addEventListener('DOMContentLoaded', () => {
             saveAvatarBtn.disabled = false;
         }
     });
-
 
     // --- Auth System Logic ---
     let isLoginMode = true;
@@ -296,11 +246,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.cookie = "starryverse_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     }
 
-    // Google Sign In
     if(googleAuthBtn) {
         googleAuthBtn.addEventListener('click', async (e) => {
             e.preventDefault();
-            
             const originalHTML = googleAuthBtn.innerHTML;
             googleAuthBtn.disabled = true;
             googleAuthBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
@@ -310,7 +258,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const provider = new GoogleAuthProvider();
             try {
                 const userCredential = await signInWithPopup(auth, provider);
-                
                 const userDocRef = doc(db, "usernames", userCredential.user.uid);
                 const userDocSnap = await getDoc(userDocRef);
                 
@@ -339,11 +286,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Form Submission (Email/Password)
     if(authForm) {
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const submitBtn = document.getElementById('authSubmitBtn');
             const originalText = submitBtn.innerText;
             submitBtn.disabled = true;
@@ -359,13 +304,11 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 if (isLoginMode) {
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    
                     if (!userCredential.user.emailVerified) {
                         await signOut(auth);
-                        alert("Please check your email and verify your account before logging in. (Be sure to check your spam or junk folder if you can't find it!)");
+                        alert("Please check your email and verify your account before logging in.");
                         return;
                     }
-
                     setLoginCookie();
                     closeModal(authModal);
                 } else {
@@ -380,13 +323,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
 
-                    if (username.length > 12) {
-                        alert("Username cannot be longer than 12 characters.");
-                        return;
-                    }
-
-                    if (username.length === 0) {
-                        alert("Username cannot be empty.");
+                    if (username.length > 12 || username.length === 0) {
+                        alert("Username must be between 1 and 12 characters.");
                         return;
                     }
 
@@ -400,10 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    await updateProfile(userCredential.user, { 
-                        displayName: username,
-                        photoURL: DEFAULT_PFP
-                    });
+                    await updateProfile(userCredential.user, { displayName: username, photoURL: DEFAULT_PFP });
                     
                     await setDoc(doc(db, "usernames", userCredential.user.uid), {
                         username: username,
@@ -416,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     await signOut(auth);
                     
                     localStorage.setItem('starryverse_account_count', (accountCount + 1).toString());
-                    alert("Registration successful! We have sent a verification link to your email. Please verify before logging in. (Be sure to check your spam or junk folder if you can't find it!)");
+                    alert("Registration successful! Check your email for the verification link.");
                     closeModal(authModal);
                 }
             } catch (error) {
@@ -430,7 +365,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Logout
     if(logoutBtn) {
         logoutBtn.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -439,13 +373,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearLoginCookie();
                 if(userDropdown) userDropdown.classList.remove('show');
                 if(userPill) userPill.classList.remove('active');
-            } catch (error) {
-                console.error("Logout Error:", error);
-            }
+            } catch (error) {}
         });
     }
 
-    // Auth State Observer
     onAuthStateChanged(auth, async (user) => {
         const userNameDisplay = document.getElementById('userNameDisplay');
         const userAvatar = document.getElementById('userAvatar');
@@ -456,10 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const displayName = user.displayName || "User";
             if (userNameDisplay) userNameDisplay.innerText = displayName;
-            
-            if (userAvatar) {
-                userAvatar.src = user.photoURL || DEFAULT_PFP;
-            }
+            if (userAvatar) userAvatar.src = user.photoURL || DEFAULT_PFP;
 
             try {
                 const userDoc = await getDoc(doc(db, "usernames", user.uid));
@@ -467,18 +395,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const data = userDoc.data();
                     gemCountDisplay.innerText = data.gems !== undefined ? data.gems : 0;
                     gemsPill.style.display = 'flex';
-                    
-                    // Failsafe: if the user changed avatar on another device, fetch it from DB
-                    if (data.avatar && userAvatar) {
-                        userAvatar.src = data.avatar;
-                    }
+                    if (data.avatar && userAvatar) userAvatar.src = data.avatar;
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
             }
-
             attachUISounds();
-
         } else {
             if (accountNavBtn) accountNavBtn.style.display = 'inline-block';
             if (userPill) userPill.style.display = 'none';
