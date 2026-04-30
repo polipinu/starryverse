@@ -29,7 +29,22 @@
             <div class="nav-links">
                 <a href="https://starryverse.site/editor" class="nav-link">Editor</a>
                 <a href="#" class="nav-link">GitHub</a>
-                <a href="javascript:void(0)" class="nav-link" onclick="openModal()">Account</a>
+                
+                <!-- Original Account Link -->
+                <a href="javascript:void(0)" class="nav-link" id="accountNav" onclick="openModal()">Account</a>
+
+                <!-- Logged In User Pill UI -->
+                <div id="userPill" class="user-pill-ui" style="display: none;" onclick="toggleDropdown(event)">
+                    <img src="" id="userAvatar" alt="Avatar">
+                    <span id="userNameDisplay">User</span>
+                    <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+                    <div id="userDropdown" class="dropdown-menu">
+                        <a href="#" onclick="logoutUser(event)" class="logout-link">
+                            <i class="fa-solid fa-right-from-bracket"></i> Log out
+                        </a>
+                    </div>
+                </div>
+
                 <a href="mailto:starryversesite@outlook.com" class="nav-link">Contact</a>
                 <a href="https://starryverse.site/play/zoombiesio" class="btn-pill btn-primary">Play Now</a>
             </div>
@@ -126,20 +141,25 @@
     <div class="modal-overlay" id="authModal">
         <div class="modal-content-pill">
             <button class="close-btn" onclick="closeModal()">&times;</button>
-            <h2 class="modal-title">Welcome Back</h2>
+            <h2 class="modal-title" id="authTitle">Welcome Back</h2>
             <div class="auth-options">
                 <button class="social-pill btn-google" onclick="showWipAlert()"><i class="fa-brands fa-google"></i> Continue with Google</button>
                 <button class="social-pill btn-discord" onclick="showWipAlert()"><i class="fa-brands fa-discord"></i> Continue with Discord</button>
             </div>
             <div class="divider"><span>OR</span></div>
-            <form class="auth-form" onsubmit="showWipAlert(); return false;">
-                <input type="email" placeholder="Email Address" required>
-                <input type="password" placeholder="Password" required>
-                <button type="submit" class="btn-pill btn-primary full-width" style="margin-top: 10px;">Sign In</button>
+            <form class="auth-form" id="authForm">
+                <input type="text" id="authUsername" placeholder="Username" style="display: none;">
+                <input type="email" id="authEmail" placeholder="Email Address" required>
+                <input type="password" id="authPassword" placeholder="Password" required>
+                <button type="submit" class="btn-pill btn-primary full-width" style="margin-top: 10px;" id="authSubmitBtn">Sign In</button>
+                <div class="auth-toggle">
+                    <a href="javascript:void(0)" onclick="toggleAuthMode()" id="authToggleText">Need an account? Register</a>
+                </div>
             </form>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Ensure module type to support Firebase imports -->
+    <script type="module" src="script.js"></script>
 </body>
 </html>

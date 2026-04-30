@@ -115,6 +115,88 @@ a {
     color: var(--primary);
 }
 
+/* User Pill & Dropdown Styling */
+.user-pill-ui {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 4px 12px 4px 4px;
+    border-radius: 50px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.user-pill-ui:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.user-pill-ui img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-pill-ui span {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-main);
+}
+
+.dropdown-icon {
+    font-size: 10px;
+    color: var(--text-muted);
+    transition: transform 0.3s ease;
+}
+
+.user-pill-ui.active .dropdown-icon {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 130%;
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px;
+    min-width: 160px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.logout-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    color: #ef4444; /* Force red text */
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.logout-link:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
 /* BUTTONS */
 .btn-pill {
     padding: 10px 24px;
@@ -463,6 +545,22 @@ a {
 .auth-form input:focus {
     outline: none;
     border-color: var(--primary);
+}
+
+.auth-toggle {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.auth-toggle a {
+    color: var(--primary);
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.auth-toggle a:hover {
+    color: var(--primary-hover);
 }
 
 /* ANIMATIONS */
