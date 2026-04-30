@@ -31,13 +31,23 @@
                 
                 <a href="#" class="nav-link" id="accountNavBtn">Account</a>
 
+                <!-- NEW: Gems Pill UI -->
+                <div id="gemsPill" class="gems-pill-ui" style="display: none;">
+                    <img src="assets/gem.png" alt="Gems">
+                    <span id="gemCountDisplay">0</span>
+                </div>
+
                 <!-- Logged In User Pill UI -->
                 <div id="userPill" class="user-pill-ui" style="display: none;">
-                    <img src="" id="userAvatar" alt="Avatar">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg" id="userAvatar" alt="Avatar">
                     <span id="userNameDisplay">User</span>
                     <i class="fa-solid fa-chevron-down dropdown-icon"></i>
                     <div id="userDropdown" class="dropdown-menu">
-                        <a href="#" id="logoutBtn" class="logout-link">
+                        <!-- NEW: Change Avatar Option -->
+                        <a href="#" id="changeAvatarNavBtn" class="dropdown-link">
+                            <i class="fa-solid fa-image"></i> Change Avatar
+                        </a>
+                        <a href="#" id="logoutBtn" class="dropdown-link logout-link">
                             <i class="fa-solid fa-right-from-bracket"></i> Log out
                         </a>
                     </div>
@@ -152,6 +162,35 @@
                     <a href="#" id="authToggleText">Need an account? Register</a>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- NEW: Avatar Selection Modal -->
+    <div class="modal-overlay" id="avatarModal">
+        <div class="modal-content-pill">
+            <button class="close-btn" id="closeAvatarModalBtn">&times;</button>
+            <h2 class="modal-title">Choose Profile Picture</h2>
+            
+            <div class="avatar-grid" id="avatarGrid">
+                <!-- 5 Default Options -->
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg" class="avatar-option selected" data-url="https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg" alt="Default 1">
+                <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Felix" class="avatar-option" data-url="https://api.dicebear.com/7.x/adventurer/svg?seed=Felix" alt="Default 2">
+                <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Aneka" class="avatar-option" data-url="https://api.dicebear.com/7.x/adventurer/svg?seed=Aneka" alt="Default 3">
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Starry" class="avatar-option" data-url="https://api.dicebear.com/7.x/bottts/svg?seed=Starry" alt="Default 4">
+                <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Smile" class="avatar-option" data-url="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Smile" alt="Default 5">
+            </div>
+
+            <div class="divider"><span>OR</span></div>
+            
+            <input type="file" id="customAvatarInput" accept="image/*" style="display: none;">
+            <button class="btn-pill btn-secondary full-width" id="uploadAvatarBtn"><i class="fa-solid fa-upload"></i> Upload Custom Image</button>
+            
+            <div id="avatarPreviewContainer" style="text-align: center; margin-top: 15px; display: none;">
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 5px;">Custom Preview:</p>
+                <img id="avatarPreview" src="" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); box-shadow: 0 0 10px var(--accent-glow);">
+            </div>
+            
+            <button class="btn-pill btn-primary full-width" id="saveAvatarBtn" style="margin-top: 20px;">Save Changes</button>
         </div>
     </div>
 

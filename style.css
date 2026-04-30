@@ -101,7 +101,7 @@ a {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 20px;
 }
 
 .nav-link {
@@ -113,6 +113,27 @@ a {
 
 .nav-link:hover {
     color: var(--primary);
+}
+
+/* NEW: Gems Pill UI */
+.gems-pill-ui {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-card);
+    border: 1px solid #fbbf24;
+    padding: 4px 12px 4px 6px;
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.15);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-main);
+}
+
+.gems-pill-ui img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
 }
 
 /* User Pill & Dropdown Styling */
@@ -165,7 +186,7 @@ a {
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 8px;
-    min-width: 160px;
+    min-width: 170px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     opacity: 0;
     visibility: hidden;
@@ -180,16 +201,30 @@ a {
     transform: translateY(0);
 }
 
-.logout-link {
+/* Updated Dropdown Links */
+.dropdown-link {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 10px 15px;
-    color: #ef4444; 
+    color: var(--text-main); 
     font-weight: 600;
     font-size: 14px;
     border-radius: 8px;
     transition: background 0.2s ease;
+    text-decoration: none;
+}
+
+.dropdown-link:hover {
+    background: var(--bg-main);
+}
+
+.logout-link {
+    color: #ef4444; 
+    margin-top: 5px;
+    border-top: 1px solid var(--border);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 .logout-link:hover {
@@ -434,7 +469,7 @@ a {
     font-size: 14px;
 }
 
-/* MODAL FIX */
+/* MODALS */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -561,6 +596,37 @@ a {
 .auth-toggle a:hover {
     color: var(--primary-hover);
 }
+
+/* NEW: Avatar Selection Grid */
+.avatar-grid {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.avatar-option {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s ease;
+    object-fit: cover;
+    background: var(--bg-main);
+}
+
+.avatar-option:hover {
+    transform: scale(1.1);
+}
+
+.avatar-option.selected {
+    border-color: var(--primary);
+    transform: scale(1.1);
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+
 
 /* ANIMATIONS */
 .fade-in-up {
