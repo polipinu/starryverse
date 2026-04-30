@@ -49,24 +49,25 @@
             <a href="#" class="nav-link" id="accountNavBtn">
                 <i class="fa-solid fa-user-plus" style="margin-right: 6px;"></i> Account
             </a>
+        </div>
 
-            <div id="gemsPill" class="gems-pill-ui" style="display: none;">
-                <img src="assets/gem.png" alt="Gems">
-                <span id="gemCountDisplay">0</span>
-            </div>
+        <!-- Gems and User pill sit OUTSIDE nav-links so they are never clipped by its overflow -->
+        <div id="gemsPill" class="gems-pill-ui" style="display: none;">
+            <img src="assets/gem.png" alt="Gems">
+            <span id="gemCountDisplay">0</span>
+        </div>
 
-            <div id="userPill" class="user-pill-ui" style="display: none;">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg" id="userAvatar" alt="Avatar">
-                <span id="userNameDisplay">User</span>
-                <i class="fa-solid fa-chevron-down dropdown-icon"></i>
-                <div id="userDropdown" class="dropdown-menu">
-                    <a href="#" id="changeAvatarNavBtn" class="dropdown-link">
-                        <i class="fa-solid fa-image"></i> Change Avatar
-                    </a>
-                    <a href="#" id="logoutBtn" class="dropdown-link logout-link">
-                        <i class="fa-solid fa-right-from-bracket"></i> Log out
-                    </a>
-                </div>
+        <div id="userPill" class="user-pill-ui" style="display: none;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg" id="userAvatar" alt="Avatar">
+            <span id="userNameDisplay">User</span>
+            <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+            <div id="userDropdown" class="dropdown-menu">
+                <a href="#" id="changeAvatarNavBtn" class="dropdown-link">
+                    <i class="fa-solid fa-image"></i> Change Avatar
+                </a>
+                <a href="#" id="logoutBtn" class="dropdown-link logout-link">
+                    <i class="fa-solid fa-right-from-bracket"></i> Log out
+                </a>
             </div>
         </div>
     </div>

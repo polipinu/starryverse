@@ -130,12 +130,16 @@ a {
 /* Ensure the navbar pill doesn't wrap on smaller screens */
 .navbar-pill {
     white-space: nowrap;
-    overflow-x: clip; /* clips horizontal overflow without creating a scroll container, so the dropdown can escape vertically */
+    overflow: visible;
+}
+
+.nav-links {
+    overflow-x: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
-.navbar-pill::-webkit-scrollbar {
+.nav-links::-webkit-scrollbar {
     display: none;
 }
 .gems-pill-ui {
