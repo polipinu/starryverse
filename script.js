@@ -210,8 +210,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     closeModal();
                 } else {
                     // --- REGISTER LOGIC ---
-                    if (localStorage.getItem('starryverse_device_registered')) {
-                        alert("Registration Failed: Only 1 account is allowed per device.");
+                    
+                    // Check device account limits
+                    let accountCount = parseInt(localStorage.getItem('starryverse_account_count') || '0');
+                    
+                    // Legacy migration: If they had the old limit format, convert it to 1
+                    if (localStorage.getItem('starryverse_device_registered') === 'true') {
+                        accountCount = Math.max(1, accountCount);
+                        localStorage.removeItem('starryverse_device_registered');
+                    }
+
+                    if (accountCount >= 3) {
+                        alert("Registration Failed: A maximum of 3 accounts is allowed per device.");
                         return;
                     }
 
@@ -252,7 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 5. Sign them out immediately so they are forced to verify
                     await signOut(auth);
                     
-                    localStorage.setItem('starryverse_device_registered', 'true');
+                    // Increase the account counter on this device
+                    localStorage.setItem('starryverse_account_count', (accountCount + 1).toString());
+                    
                     alert("Registration successful! We have sent a verification link to your email. Please verify before logging in. (Be sure to check your spam or junk folder if you can't find it!)");
                     closeModal();
                 }
