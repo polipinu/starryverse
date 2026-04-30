@@ -88,10 +88,26 @@ a {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 40px;
+    gap: 16px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     max-width: 1000px;
     width: 100%;
+    overflow: visible;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+    justify-content: center;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.nav-links::-webkit-scrollbar {
+    display: none;
 }
 
 .svg-text {
@@ -127,21 +143,7 @@ a {
     transform: scale(1.1);
 }
 
-/* Ensure the navbar pill doesn't wrap on smaller screens */
-.navbar-pill {
-    white-space: nowrap;
-    overflow: visible;
-}
 
-.nav-links {
-    overflow-x: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-.nav-links::-webkit-scrollbar {
-    display: none;
-}
 .user-group {
     display: flex;
     align-items: center;

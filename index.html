@@ -16,6 +16,7 @@
 
 <nav class="navbar-wrapper">
     <div class="navbar-pill">
+
         <div class="logo">
             <a href="#">
                 <svg width="180" height="40" viewBox="0 0 180 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -25,53 +26,47 @@
                 </svg>
             </a>
         </div>
-        
+
         <div class="nav-links">
-            <!-- Play Now moved to the left side -->
             <a href="https://starryverse.site/play/zoombiesio" class="btn-pill btn-primary" style="padding: 8px 20px;">
                 <i class="fa-solid fa-play" style="margin-right: 8px;"></i> Play Now
             </a>
-
             <a href="https://starryverse.site/editor" class="nav-link">
                 <i class="fa-solid fa-code" style="margin-right: 6px;"></i> Editor
             </a>
-            
             <a href="https://github.com/your-repo" target="_blank" class="nav-link">
                 <i class="fa-brands fa-github" style="margin-right: 6px;"></i> GitHub
             </a>
-            
-            <!-- Discord replacing Contact -->
             <a href="https://discord.gg/dsRQDsfGx7" target="_blank" class="nav-link">
                 <i class="fa-brands fa-discord" style="margin-right: 6px;"></i> Discord
             </a>
-
-            <!-- Account/Gems moved to the far right -->
             <a href="#" class="nav-link" id="accountNavBtn">
                 <i class="fa-solid fa-user-plus" style="margin-right: 6px;"></i> Account
             </a>
         </div>
 
-        <!-- Gems and User pill sit OUTSIDE nav-links so they are never clipped by its overflow -->
+        <!-- User group sits outside nav-links so the dropdown is never clipped -->
         <div class="user-group">
-        <div id="gemsPill" class="gems-pill-ui" style="display: none;">
-            <img src="assets/gem.png" alt="Gems">
-            <span id="gemCountDisplay">0</span>
-        </div>
-
-        <div id="userPill" class="user-pill-ui" style="display: none;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg" id="userAvatar" alt="Avatar">
-            <span id="userNameDisplay">User</span>
-            <i class="fa-solid fa-chevron-down dropdown-icon"></i>
-            <div id="userDropdown" class="dropdown-menu">
-                <a href="#" id="changeAvatarNavBtn" class="dropdown-link">
-                    <i class="fa-solid fa-image"></i> Change Avatar
-                </a>
-                <a href="#" id="logoutBtn" class="dropdown-link logout-link">
-                    <i class="fa-solid fa-right-from-bracket"></i> Log out
-                </a>
+            <div id="gemsPill" class="gems-pill-ui" style="display: none;">
+                <img src="assets/gem.png" alt="Gems">
+                <span id="gemCountDisplay">0</span>
+            </div>
+            <div id="userPill" class="user-pill-ui" style="display: none;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg" id="userAvatar" alt="Avatar">
+                <span id="userNameDisplay">User</span>
+                <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+                <div id="userDropdown" class="dropdown-menu">
+                    <a href="#" id="changeAvatarNavBtn" class="dropdown-link">
+                        <i class="fa-solid fa-image"></i> Change Avatar
+                    </a>
+                    <a href="#" id="logoutBtn" class="dropdown-link logout-link">
+                        <i class="fa-solid fa-right-from-bracket"></i> Log out
+                    </a>
+                </div>
             </div>
         </div>
-        </div> <!-- end .user-group -->
+
+    </div>
 </nav>
 
     <div class="hero-wrapper">
