@@ -150,6 +150,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if(googleAuthBtn) {
         googleAuthBtn.addEventListener('click', async (e) => {
             e.preventDefault();
+            
+            // Disable button to prevent spamming
+            const originalHTML = googleAuthBtn.innerHTML;
+            googleAuthBtn.disabled = true;
+            googleAuthBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+            googleAuthBtn.style.opacity = "0.7";
+            googleAuthBtn.style.cursor = "not-allowed";
+
             const provider = new GoogleAuthProvider();
             try {
                 await signInWithPopup(auth, provider);
@@ -157,6 +165,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeModal();
             } catch (error) {
                 alert("Google Sign-In Error: " + error.message);
+            } finally {
+                // Re-enable button
+                googleAuthBtn.disabled = false;
+                googleAuthBtn.innerHTML = originalHTML;
+                googleAuthBtn.style.opacity = "1";
+                googleAuthBtn.style.cursor = "pointer";
             }
         });
     }
@@ -165,6 +179,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if(authForm) {
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const submitBtn = document.getElementById('authSubmitBtn');
+            
+            // Disable button to prevent spamming multiple accounts
+            const originalText = submitBtn.innerText;
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Processing...";
+            submitBtn.style.opacity = "0.7";
+            submitBtn.style.cursor = "not-allowed";
+
             const email = document.getElementById('authEmail').value;
             const password = document.getElementById('authPassword').value;
             const usernameInput = document.getElementById('authUsername');
@@ -223,6 +247,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 alert(error.message);
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalText;
+                submitBtn.style.opacity = "1";
+                submitBtn.style.cursor = "pointer";
             }
         });
     }
