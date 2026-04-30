@@ -1,4 +1,4 @@
-// Import the functions you need from the SDKs
+// Import the functions you need from the SDKs (Notice: Storage is completely removed!)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
 import { 
@@ -23,12 +23,6 @@ import {
     where, 
     getDocs 
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-import { 
-    getStorage, 
-    ref, 
-    uploadBytes, 
-    getDownloadURL 
-} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-storage.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -41,18 +35,16 @@ const firebaseConfig = {
     measurementId: "G-EWXBVFJ47Q"
 };
 
-// Initialize Firebase services
+// Initialize Firebase & Firestore
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 // Global Constants
 const DEFAULT_PFP = 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg';
 
 // --- UI Sounds Setup ---
-// Using reliable mixkit UI audio URLs
 const sfxHover = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
 const sfxClick = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
 sfxHover.volume = 0.1;
@@ -60,7 +52,7 @@ sfxClick.volume = 0.3;
 
 function playHoverSound() {
     sfxHover.currentTime = 0;
-    sfxHover.play().catch(() => {}); // Catch prevents errors if user hasn't interacted with document yet
+    sfxHover.play().catch(() => {});
 }
 
 function playClickSound() {
@@ -68,31 +60,22 @@ function playClickSound() {
     sfxClick.play().catch(() => {});
 }
 
-// Function to attach sounds to all interactive elements
 function attachUISounds() {
     const interactables = document.querySelectorAll('a, button, .user-pill-ui, .avatar-option');
     interactables.forEach(el => {
-        // Prevent adding multiple listeners
         el.removeEventListener('mouseenter', playHoverSound);
         el.removeEventListener('click', playClickSound);
-        
         el.addEventListener('mouseenter', playHoverSound);
         el.addEventListener('click', playClickSound);
     });
 }
 
-
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Attach initial sounds
     attachUISounds();
 
     // --- Scroll Animations ---
-    const observerOptions = {
-        threshold: 0.1, 
-        rootMargin: "0px 0px -50px 0px"
-    };
-
+    const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -101,7 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }, observerOptions);
-
     document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
 
     // --- DOM Elements ---
@@ -150,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if(changeAvatarNavBtn) changeAvatarNavBtn.addEventListener('click', (e) => { e.preventDefault(); openModal(avatarModal); });
     if(closeAvatarModalBtn) closeAvatarModalBtn.addEventListener('click', () => closeModal(avatarModal));
 
-    // Global Click Listener (Close modals/dropdowns on outside click)
     window.addEventListener('click', (event) => {
         if (event.target === authModal) closeModal(authModal);
         if (event.target === avatarModal) closeModal(avatarModal);
@@ -161,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- User Pill Dropdown ---
     if(userPill) {
         userPill.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -170,69 +150,88 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Avatar Changing System ---
+    // --- Avatar Changing System (100% Free Base64 Hack) ---
     let selectedAvatarUrl = DEFAULT_PFP;
 
-    // Handle clicking a default avatar
     avatarOptions.forEach(opt => {
         opt.addEventListener('click', (e) => {
-            // Remove selection from all, add to clicked
             avatarOptions.forEach(o => o.classList.remove('selected'));
             e.target.classList.add('selected');
-            
             selectedAvatarUrl = e.target.getAttribute('data-url');
-            
-            // Hide custom preview since they clicked a default
             avatarPreviewContainer.style.display = 'none';
         });
     });
 
-    // Trigger hidden file input
     uploadAvatarBtn.addEventListener('click', (e) => {
         e.preventDefault();
         customAvatarInput.click();
     });
 
-    // Handle Custom File Upload
+    // Handle Custom File Upload & Compress it to save database space
     customAvatarInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        // Security check limit (Max 2MB)
-        if (file.size > 2 * 1024 * 1024) {
-            alert("Image is too large. Maximum size is 2MB.");
-            return;
-        }
-
         const originalText = uploadAvatarBtn.innerHTML;
-        uploadAvatarBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
+        uploadAvatarBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing Image...';
         uploadAvatarBtn.disabled = true;
 
         try {
-            // Upload to Firebase Storage under a unique name for this user
-            const storageRef = ref(storage, `avatars/${auth.currentUser.uid}_${Date.now()}`);
-            await uploadBytes(storageRef, file);
-            const downloadUrl = await getDownloadURL(storageRef);
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    // Create an invisible canvas to resize the image
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 200; // Small size fits safely in Firestore
+                    const MAX_HEIGHT = 200;
+                    let width = img.width;
+                    let height = img.height;
 
-            // Update variables
-            selectedAvatarUrl = downloadUrl;
-            
-            // Deselect default options visually
-            avatarOptions.forEach(o => o.classList.remove('selected'));
+                    // Calculate aspect ratio mathematically
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
 
-            // Show custom preview
-            avatarPreview.src = downloadUrl;
-            avatarPreviewContainer.style.display = 'block';
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    // Draw the resized image onto the canvas
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Convert the canvas drawing into a compressed JPEG text string (0.7 quality)
+                    const base64String = canvas.toDataURL('image/jpeg', 0.7);
+
+                    // Update UI and variables
+                    selectedAvatarUrl = base64String;
+                    avatarOptions.forEach(o => o.classList.remove('selected'));
+                    avatarPreview.src = base64String;
+                    avatarPreviewContainer.style.display = 'block';
+
+                    uploadAvatarBtn.innerHTML = originalText;
+                    uploadAvatarBtn.disabled = false;
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
 
         } catch (error) {
-            alert("Upload failed. Make sure Firebase Storage rules allow writes. Error: " + error.message);
-        } finally {
+            alert("Image processing failed: " + error.message);
             uploadAvatarBtn.innerHTML = originalText;
             uploadAvatarBtn.disabled = false;
         }
     });
 
-    // Save final avatar choice
+    // Save final avatar choice to Free Database
     saveAvatarBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         if(!auth.currentUser) return;
@@ -241,15 +240,13 @@ document.addEventListener('DOMContentLoaded', () => {
         saveAvatarBtn.disabled = true;
 
         try {
-            // 1. Update Auth Profile
             await updateProfile(auth.currentUser, { photoURL: selectedAvatarUrl });
             
-            // 2. Update Firestore Document
+            // Save the Base64 string directly to the user's document in Firestore
             await updateDoc(doc(db, "usernames", auth.currentUser.uid), {
                 avatar: selectedAvatarUrl
             });
 
-            // 3. Update active UI immediately
             document.getElementById('userAvatar').src = selectedAvatarUrl;
             closeModal(avatarModal);
             
@@ -289,7 +286,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Cookie Helpers
     function setLoginCookie() {
         let date = new Date();
         date.setTime(date.getTime() + (7*24*60*60*1000));
@@ -315,7 +311,6 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const userCredential = await signInWithPopup(auth, provider);
                 
-                // --- GOOGLE FIX: Check if they exist in Firestore database. If not, generate their profile and gems ---
                 const userDocRef = doc(db, "usernames", userCredential.user.uid);
                 const userDocSnap = await getDoc(userDocRef);
                 
@@ -363,7 +358,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 if (isLoginMode) {
-                    // --- LOGIN LOGIC ---
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
                     
                     if (!userCredential.user.emailVerified) {
@@ -375,9 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     setLoginCookie();
                     closeModal(authModal);
                 } else {
-                    // --- REGISTER LOGIC ---
-                    
-                    // Device Limit Check
                     let accountCount = parseInt(localStorage.getItem('starryverse_account_count') || '0');
                     if (localStorage.getItem('starryverse_device_registered') === 'true') {
                         accountCount = Math.max(1, accountCount);
@@ -389,7 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
 
-                    // Security Checks
                     if (username.length > 12) {
                         alert("Username cannot be longer than 12 characters.");
                         return;
@@ -400,7 +390,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
 
-                    // 1. Database Check
                     const usernamesRef = collection(db, "usernames");
                     const q = query(usernamesRef, where("username_lower", "==", username.toLowerCase()));
                     const querySnapshot = await getDocs(q);
@@ -410,22 +399,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         return; 
                     }
 
-                    // 2. Create Auth Account & Apply Default Avatar directly
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     await updateProfile(userCredential.user, { 
                         displayName: username,
-                        photoURL: DEFAULT_PFP // Apply new Default standard
+                        photoURL: DEFAULT_PFP
                     });
                     
-                    // 3. Save to Firestore WITH Gems and Avatar applied
                     await setDoc(doc(db, "usernames", userCredential.user.uid), {
                         username: username,
                         username_lower: username.toLowerCase(),
-                        gems: 0, // NEW GEMS SYSTEM
+                        gems: 0,
                         avatar: DEFAULT_PFP
                     });
                     
-                    // 4. Verification
                     await sendEmailVerification(userCredential.user);
                     await signOut(auth);
                     
@@ -465,38 +451,38 @@ document.addEventListener('DOMContentLoaded', () => {
         const userAvatar = document.getElementById('userAvatar');
 
         if (user && (user.emailVerified || user.providerData.some(p => p.providerId === 'google.com'))) {
-            // Logged In & Verified (or Google user)
             if (accountNavBtn) accountNavBtn.style.display = 'none';
             if (userPill) userPill.style.display = 'flex';
             
             const displayName = user.displayName || "User";
             if (userNameDisplay) userNameDisplay.innerText = displayName;
             
-            // Set Avatar (Fallback to the new requested default if none exists)
             if (userAvatar) {
                 userAvatar.src = user.photoURL || DEFAULT_PFP;
             }
 
-            // --- FETCH GEMS FROM FIRESTORE ---
             try {
                 const userDoc = await getDoc(doc(db, "usernames", user.uid));
                 if (userDoc.exists()) {
                     const data = userDoc.data();
                     gemCountDisplay.innerText = data.gems !== undefined ? data.gems : 0;
-                    gemsPill.style.display = 'flex'; // Show gems UI
+                    gemsPill.style.display = 'flex';
+                    
+                    // Failsafe: if the user changed avatar on another device, fetch it from DB
+                    if (data.avatar && userAvatar) {
+                        userAvatar.src = data.avatar;
+                    }
                 }
             } catch (error) {
-                console.error("Error fetching gems:", error);
+                console.error("Error fetching user data:", error);
             }
 
-            // Make sure new dynamic UI elements get sounds attached
             attachUISounds();
 
         } else {
-            // Logged Out
             if (accountNavBtn) accountNavBtn.style.display = 'inline-block';
             if (userPill) userPill.style.display = 'none';
-            if (gemsPill) gemsPill.style.display = 'none'; // Hide gems
+            if (gemsPill) gemsPill.style.display = 'none';
         }
     });
 });
