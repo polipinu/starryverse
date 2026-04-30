@@ -115,20 +115,15 @@ a {
     color: var(--primary);
 }
 
-/* NEW: Gems Pill UI (Blue Gradient Border) */
 .gems-pill-ui {
     display: flex;
     align-items: center;
     gap: 6px;
     
-    /* Using background-clip to create a gradient border on a rounded pill */
-    background: linear-gradient(var(--bg-card), var(--bg-card)) padding-box,
-                linear-gradient(135deg, #0ea5e9, #3b82f6) border-box;
-    border: 2px solid transparent;
+    border: 1px solid var(--border);
     
     padding: 3px 12px 3px 6px;
     border-radius: 50px;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25); /* Blue glow */
     font-weight: 700;
     font-size: 14px;
     color: var(--text-main);
