@@ -1,29 +1,28 @@
-// Import the functions you need from the SDKs (No Storage needed)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
-import { 
-    getAuth, 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    onAuthStateChanged, 
-    signOut, 
-    updateProfile, 
-    GoogleAuthProvider, 
-    signInWithPopup, 
-    sendEmailVerification 
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut,
+    updateProfile,
+    GoogleAuthProvider,
+    signInWithPopup,
+    sendEmailVerification
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { 
-    getFirestore, 
-    doc, 
-    setDoc, 
+import {
+    getFirestore,
+    doc,
+    setDoc,
     getDoc,
-    collection, 
-    query, 
-    where, 
-    getDocs 
+    updateDoc,
+    collection,
+    query,
+    where,
+    getDocs
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAw4PQJcwXYx8a3E5xFtqQBx4nacr7ZVGM",
     authDomain: "starryverse-5e574.firebaseapp.com",
@@ -34,34 +33,46 @@ const firebaseConfig = {
     measurementId: "G-EWXBVFJ47Q"
 };
 
-// Initialize Firebase services
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+getAnalytics(app); // initialise analytics but don't expose the handle
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Global Constants
 const DEFAULT_PFP = 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg';
 
-// --- UI Sounds Setup ---
+// ─── Allowed avatar URL hostnames (whitelist) ──────────────────────────────
+// SECURITY: only accept images from known safe hosts so users can't point
+// avatars at tracking pixels, private-network URLs, etc.
+const ALLOWED_AVATAR_HOSTS = [
+    'i.imgur.com',
+    'i.ibb.co',
+    'cdn.discordapp.com',
+    'media.discordapp.net',
+    'upload.wikimedia.org',
+    'api.dicebear.com',
+];
+
+function isAllowedAvatarUrl(rawUrl) {
+    try {
+        const url = new URL(rawUrl);
+        if (url.protocol !== 'https:') return false;
+        return ALLOWED_AVATAR_HOSTS.some(host => url.hostname === host || url.hostname.endsWith('.' + host));
+    } catch {
+        return false;
+    }
+}
+
+// ─── UI Sounds ─────────────────────────────────────────────────────────────
 const sfxHover = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
 const sfxClick = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
 sfxHover.volume = 0.1;
 sfxClick.volume = 0.3;
 
-function playHoverSound() {
-    sfxHover.currentTime = 0;
-    sfxHover.play().catch(() => {});
-}
-
-function playClickSound() {
-    sfxClick.currentTime = 0;
-    sfxClick.play().catch(() => {});
-}
+function playHoverSound() { sfxHover.currentTime = 0; sfxHover.play().catch(() => {}); }
+function playClickSound() { sfxClick.currentTime = 0; sfxClick.play().catch(() => {}); }
 
 function attachUISounds() {
-    const interactables = document.querySelectorAll('a, button, .user-pill-ui, .avatar-option');
-    interactables.forEach(el => {
+    document.querySelectorAll('a, button, .user-pill-ui, .avatar-option').forEach(el => {
         el.removeEventListener('mouseenter', playHoverSound);
         el.removeEventListener('click', playClickSound);
         el.addEventListener('mouseenter', playHoverSound);
@@ -69,12 +80,29 @@ function attachUISounds() {
     });
 }
 
+// ─── Username validation (mirrors Firestore rule) ──────────────────────────
+function isValidUsername(name) {
+    return typeof name === 'string' && name.length >= 1 && name.length <= 12;
+}
+
+// ─── Cookie helpers ────────────────────────────────────────────────────────
+function setLoginCookie() {
+    const date = new Date();
+    date.setTime(date.getTime() + 7 * 24 * 60 * 60 * 1000);
+    // SameSite=Strict prevents CSRF; Secure flag ensures HTTPS only
+    document.cookie = `starryverse_session=true; expires=${date.toUTCString()}; path=/; SameSite=Strict; Secure`;
+}
+
+function clearLoginCookie() {
+    document.cookie = "starryverse_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict;";
+}
+
+// ─── DOMContentLoaded ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     attachUISounds();
 
-    // --- Scroll Animations ---
-    const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+    // Scroll animations
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -82,126 +110,117 @@ document.addEventListener('DOMContentLoaded', () => {
                 observer.unobserve(entry.target);
             }
         });
-    }, observerOptions);
+    }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
     document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
 
-    // --- DOM Elements ---
-    const accountNavBtn = document.getElementById('accountNavBtn');
-    const authModal = document.getElementById('authModal');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const googleAuthBtn = document.getElementById('googleAuthBtn');
-    const authToggleText = document.getElementById('authToggleText');
-    const authForm = document.getElementById('authForm');
-    
-    const userPill = document.getElementById('userPill');
-    const userDropdown = document.getElementById('userDropdown');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const gemsPill = document.getElementById('gemsPill');
-    const gemCountDisplay = document.getElementById('gemCountDisplay');
-    
-    const avatarModal = document.getElementById('avatarModal');
+    // DOM refs
+    const accountNavBtn      = document.getElementById('accountNavBtn');
+    const authModal          = document.getElementById('authModal');
+    const closeModalBtn      = document.getElementById('closeModalBtn');
+    const googleAuthBtn      = document.getElementById('googleAuthBtn');
+    const authToggleText     = document.getElementById('authToggleText');
+    const authForm           = document.getElementById('authForm');
+    const userPill           = document.getElementById('userPill');
+    const userDropdown       = document.getElementById('userDropdown');
+    const logoutBtn          = document.getElementById('logoutBtn');
+    const gemsPill           = document.getElementById('gemsPill');
+    const gemCountDisplay    = document.getElementById('gemCountDisplay');
+    const avatarModal        = document.getElementById('avatarModal');
     const changeAvatarNavBtn = document.getElementById('changeAvatarNavBtn');
-    const closeAvatarModalBtn = document.getElementById('closeAvatarModalBtn');
-    const avatarOptions = document.querySelectorAll('.avatar-option');
-    
-    // NEW: URL Elements
+    const closeAvatarModalBtn= document.getElementById('closeAvatarModalBtn');
+    const avatarOptions      = document.querySelectorAll('.avatar-option');
     const customAvatarUrlInput = document.getElementById('customAvatarUrlInput');
-    const previewUrlBtn = document.getElementById('previewUrlBtn');
-    const saveAvatarBtn = document.getElementById('saveAvatarBtn');
+    const previewUrlBtn      = document.getElementById('previewUrlBtn');
+    const saveAvatarBtn      = document.getElementById('saveAvatarBtn');
     const avatarPreviewContainer = document.getElementById('avatarPreviewContainer');
-    const avatarPreview = document.getElementById('avatarPreview');
+    const avatarPreview      = document.getElementById('avatarPreview');
 
-    // --- Core Modal Logic ---
+    // ── Modal helpers ──────────────────────────────────────────────────────
     function openModal(modalEl) {
         modalEl.style.display = 'flex';
-        setTimeout(() => {
-            modalEl.style.opacity = '1';
-            modalEl.classList.add('active');
-        }, 10);
+        setTimeout(() => { modalEl.style.opacity = '1'; modalEl.classList.add('active'); }, 10);
     }
-
     function closeModal(modalEl) {
         modalEl.style.opacity = '0';
         modalEl.classList.remove('active');
-        setTimeout(() => {
-            modalEl.style.display = 'none';
-        }, 300);
+        setTimeout(() => { modalEl.style.display = 'none'; }, 300);
     }
 
-    if(accountNavBtn) accountNavBtn.addEventListener('click', (e) => { e.preventDefault(); openModal(authModal); });
-    if(closeModalBtn) closeModalBtn.addEventListener('click', () => closeModal(authModal));
-    if(changeAvatarNavBtn) changeAvatarNavBtn.addEventListener('click', (e) => { e.preventDefault(); openModal(avatarModal); });
-    if(closeAvatarModalBtn) closeAvatarModalBtn.addEventListener('click', () => closeModal(avatarModal));
+    accountNavBtn?.addEventListener('click',       e => { e.preventDefault(); openModal(authModal); });
+    closeModalBtn?.addEventListener('click',       ()  => closeModal(authModal));
+    changeAvatarNavBtn?.addEventListener('click',  e => { e.preventDefault(); openModal(avatarModal); });
+    closeAvatarModalBtn?.addEventListener('click', ()  => closeModal(avatarModal));
 
-    window.addEventListener('click', (event) => {
-        if (event.target === authModal) closeModal(authModal);
+    window.addEventListener('click', event => {
+        if (event.target === authModal)   closeModal(authModal);
         if (event.target === avatarModal) closeModal(avatarModal);
-        if (userDropdown && userDropdown.classList.contains('show') && userPill && !userPill.contains(event.target)) {
+        if (userDropdown?.classList.contains('show') && !userPill?.contains(event.target)) {
             userDropdown.classList.remove('show');
-            userPill.classList.remove('active');
+            userPill?.classList.remove('active');
         }
     });
 
-    if(userPill) {
-        userPill.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if(userDropdown) userDropdown.classList.toggle('show');
-            userPill.classList.toggle('active');
-        });
-    }
+    userPill?.addEventListener('click', e => {
+        e.stopPropagation();
+        userDropdown?.classList.toggle('show');
+        userPill.classList.toggle('active');
+    });
 
-    // --- Avatar Changing System (URL Workaround) ---
+    // ── Avatar system ──────────────────────────────────────────────────────
     let selectedAvatarUrl = DEFAULT_PFP;
 
-    // Handle Default Clicks
     avatarOptions.forEach(opt => {
-        opt.addEventListener('click', (e) => {
+        opt.addEventListener('click', e => {
             avatarOptions.forEach(o => o.classList.remove('selected'));
             e.target.classList.add('selected');
             selectedAvatarUrl = e.target.getAttribute('data-url');
             avatarPreviewContainer.style.display = 'none';
-            customAvatarUrlInput.value = ''; // Clear text field if they click a default
+            customAvatarUrlInput.value = '';
         });
     });
 
-    // Handle Custom URL Preview
-    previewUrlBtn.addEventListener('click', (e) => {
+    previewUrlBtn?.addEventListener('click', e => {
         e.preventDefault();
         const url = customAvatarUrlInput.value.trim();
 
-        if(!url.startsWith('http')) {
-            alert("Please enter a valid image link starting with http:// or https://");
+        // SECURITY: validate against allowed-host whitelist
+        if (!isAllowedAvatarUrl(url)) {
+            alert("Please use a direct HTTPS image link from an allowed host (Imgur, ImgBB, Discord CDN, etc.).");
             return;
         }
 
-        // Unselect default options visually
         avatarOptions.forEach(o => o.classList.remove('selected'));
-
         selectedAvatarUrl = url;
         avatarPreview.src = url;
         avatarPreviewContainer.style.display = 'block';
     });
 
-    // Save final choice to Auth and Firestore
-    saveAvatarBtn.addEventListener('click', async (e) => {
+    saveAvatarBtn?.addEventListener('click', async e => {
         e.preventDefault();
-        if(!auth.currentUser) return;
+        if (!auth.currentUser) return;
+
+        // Re-validate before saving (don't trust the earlier preview check alone)
+        if (!isAllowedAvatarUrl(selectedAvatarUrl) && selectedAvatarUrl !== DEFAULT_PFP) {
+            alert("Invalid avatar URL.");
+            return;
+        }
 
         saveAvatarBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
         saveAvatarBtn.disabled = true;
 
         try {
             await updateProfile(auth.currentUser, { photoURL: selectedAvatarUrl });
-            
-            // Using setDoc with merge so it never crashes if the document is missing
-            await setDoc(doc(db, "usernames", auth.currentUser.uid), {
+
+            // SECURITY: use updateDoc (not setDoc) and only touch the avatar field.
+            // The Firestore rule blocks any write that touches `gems`, so this is safe
+            // even if someone tries to inject extra fields via the console.
+            await updateDoc(doc(db, "usernames", auth.currentUser.uid), {
                 avatar: selectedAvatarUrl
-            }, { merge: true });
+            });
 
             document.getElementById('userAvatar').src = selectedAvatarUrl;
             closeModal(avatarModal);
-            
-        } catch(error) {
+        } catch (error) {
             alert("Failed to save profile picture: " + error.message);
         } finally {
             saveAvatarBtn.innerHTML = 'Save Changes';
@@ -209,202 +228,194 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Auth System Logic ---
+    // ── Auth system ────────────────────────────────────────────────────────
     let isLoginMode = true;
 
-    if(authToggleText) {
-        authToggleText.addEventListener('click', (e) => {
-            e.preventDefault();
-            isLoginMode = !isLoginMode;
-            const title = document.getElementById('authTitle');
-            const submitBtn = document.getElementById('authSubmitBtn');
-            const usernameInput = document.getElementById('authUsername');
+    authToggleText?.addEventListener('click', e => {
+        e.preventDefault();
+        isLoginMode = !isLoginMode;
+        const title       = document.getElementById('authTitle');
+        const submitBtn   = document.getElementById('authSubmitBtn');
+        const usernameInput = document.getElementById('authUsername');
 
-            if (isLoginMode) {
-                title.innerText = "Welcome Back";
-                submitBtn.innerText = "Sign In";
-                authToggleText.innerText = "Need an account? Register";
-                usernameInput.style.display = "none";
-                usernameInput.removeAttribute('required');
-            } else {
-                title.innerText = "Create Account";
-                submitBtn.innerText = "Register";
-                authToggleText.innerText = "Already have an account? Sign In";
-                usernameInput.style.display = "block";
-                usernameInput.setAttribute('required', 'true');
+        if (isLoginMode) {
+            title.innerText = "Welcome Back";
+            submitBtn.innerText = "Sign In";
+            authToggleText.innerText = "Need an account? Register";
+            usernameInput.style.display = "none";
+            usernameInput.removeAttribute('required');
+        } else {
+            title.innerText = "Create Account";
+            submitBtn.innerText = "Register";
+            authToggleText.innerText = "Already have an account? Sign In";
+            usernameInput.style.display = "block";
+            usernameInput.setAttribute('required', 'true');
+        }
+    });
+
+    googleAuthBtn?.addEventListener('click', async e => {
+        e.preventDefault();
+        const originalHTML = googleAuthBtn.innerHTML;
+        googleAuthBtn.disabled = true;
+        googleAuthBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+        googleAuthBtn.style.opacity = "0.7";
+
+        try {
+            const userCredential = await signInWithPopup(auth, new GoogleAuthProvider());
+            const userDocRef  = doc(db, "usernames", userCredential.user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (!userDocSnap.exists()) {
+                const defaultName   = (userCredential.user.displayName || "GoogleUser").slice(0, 12);
+                const finalAvatar   = userCredential.user.photoURL || DEFAULT_PFP;
+                // SECURITY: gems is set to 0 here — Firestore rule enforces this on create
+                await setDoc(userDocRef, {
+                    username:       defaultName,
+                    username_lower: defaultName.toLowerCase(),
+                    gems:           0,
+                    avatar:         finalAvatar
+                });
             }
-        });
-    }
 
-    function setLoginCookie() {
-        let date = new Date();
-        date.setTime(date.getTime() + (7*24*60*60*1000));
-        document.cookie = "starryverse_session=true; expires=" + date.toUTCString() + "; path=/";
-    }
+            setLoginCookie();
+            closeModal(authModal);
+        } catch (error) {
+            alert("Google Sign-In Error: " + error.message);
+        } finally {
+            googleAuthBtn.disabled = false;
+            googleAuthBtn.innerHTML = originalHTML;
+            googleAuthBtn.style.opacity = "1";
+        }
+    });
 
-    function clearLoginCookie() {
-        document.cookie = "starryverse_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    }
+    authForm?.addEventListener('submit', async e => {
+        e.preventDefault();
+        const submitBtn   = document.getElementById('authSubmitBtn');
+        const originalText = submitBtn.innerText;
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Processing...";
+        submitBtn.style.opacity = "0.7";
 
-    if(googleAuthBtn) {
-        googleAuthBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const originalHTML = googleAuthBtn.innerHTML;
-            googleAuthBtn.disabled = true;
-            googleAuthBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-            googleAuthBtn.style.opacity = "0.7";
-            googleAuthBtn.style.cursor = "not-allowed";
+        const email    = document.getElementById('authEmail').value.trim();
+        const password = document.getElementById('authPassword').value;
+        const usernameInput = document.getElementById('authUsername');
+        const username = usernameInput ? usernameInput.value.trim() : "User";
 
-            const provider = new GoogleAuthProvider();
-            try {
-                const userCredential = await signInWithPopup(auth, provider);
-                const userDocRef = doc(db, "usernames", userCredential.user.uid);
-                const userDocSnap = await getDoc(userDocRef);
-                
-                if (!userDocSnap.exists()) {
-                    let defaultName = userCredential.user.displayName || "GoogleUser";
-                    let finalAvatar = userCredential.user.photoURL || DEFAULT_PFP;
-                    
-                    await setDoc(userDocRef, {
-                        username: defaultName,
-                        username_lower: defaultName.toLowerCase(),
-                        gems: 0,
-                        avatar: finalAvatar
-                    });
+        try {
+            if (isLoginMode) {
+                // ── Login ──────────────────────────────────────────────────
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                if (!userCredential.user.emailVerified) {
+                    await signOut(auth);
+                    alert("Please verify your email before logging in.");
+                    return;
                 }
-                
                 setLoginCookie();
                 closeModal(authModal);
-            } catch (error) {
-                alert("Google Sign-In Error: " + error.message);
-            } finally {
-                googleAuthBtn.disabled = false;
-                googleAuthBtn.innerHTML = originalHTML;
-                googleAuthBtn.style.opacity = "1";
-                googleAuthBtn.style.cursor = "pointer";
-            }
-        });
-    }
 
-    if(authForm) {
-        authForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const submitBtn = document.getElementById('authSubmitBtn');
-            const originalText = submitBtn.innerText;
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Processing...";
-            submitBtn.style.opacity = "0.7";
-            submitBtn.style.cursor = "not-allowed";
-
-            const email = document.getElementById('authEmail').value;
-            const password = document.getElementById('authPassword').value;
-            const usernameInput = document.getElementById('authUsername');
-            const username = usernameInput ? usernameInput.value.trim() : "User";
-
-            try {
-                if (isLoginMode) {
-                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    if (!userCredential.user.emailVerified) {
-                        await signOut(auth);
-                        alert("Please check your email and verify your account before logging in.");
-                        return;
-                    }
-                    setLoginCookie();
-                    closeModal(authModal);
-                } else {
-                    let accountCount = parseInt(localStorage.getItem('starryverse_account_count') || '0');
-                    if (localStorage.getItem('starryverse_device_registered') === 'true') {
-                        accountCount = Math.max(1, accountCount);
-                        localStorage.removeItem('starryverse_device_registered');
-                    }
-
-                    if (accountCount >= 3) {
-                        alert("Registration Failed: A maximum of 3 accounts is allowed per device.");
-                        return;
-                    }
-
-                    if (username.length > 12 || username.length === 0) {
-                        alert("Username must be between 1 and 12 characters.");
-                        return;
-                    }
-
-                    const usernamesRef = collection(db, "usernames");
-                    const q = query(usernamesRef, where("username_lower", "==", username.toLowerCase()));
-                    const querySnapshot = await getDocs(q);
-
-                    if (!querySnapshot.empty) {
-                        alert("Username is already taken! Please choose another one.");
-                        return; 
-                    }
-
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    await updateProfile(userCredential.user, { displayName: username, photoURL: DEFAULT_PFP });
-                    
-                    await setDoc(doc(db, "usernames", userCredential.user.uid), {
-                        username: username,
-                        username_lower: username.toLowerCase(),
-                        gems: 0,
-                        avatar: DEFAULT_PFP
-                    });
-                    
-                    await sendEmailVerification(userCredential.user);
-                    await signOut(auth);
-                    
-                    localStorage.setItem('starryverse_account_count', (accountCount + 1).toString());
-                    alert("Registration successful! Check your email for the verification link.");
-                    closeModal(authModal);
+            } else {
+                // ── Register ───────────────────────────────────────────────
+                // NOTE: localStorage limit is a soft UX nudge only.
+                // Real per-device limiting requires a Cloud Function + fingerprinting.
+                const accountCount = parseInt(localStorage.getItem('starryverse_account_count') || '0');
+                if (accountCount >= 3) {
+                    alert("Registration Failed: A maximum of 3 accounts is allowed per device.");
+                    return;
                 }
-            } catch (error) {
-                alert(error.message);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = originalText;
-                submitBtn.style.opacity = "1";
-                submitBtn.style.cursor = "pointer";
-            }
-        });
-    }
 
-    if(logoutBtn) {
-        logoutBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            try {
+                // Client-side username validation (mirrors Firestore rule)
+                if (!isValidUsername(username)) {
+                    alert("Username must be between 1 and 12 characters.");
+                    return;
+                }
+
+                // Check username uniqueness
+                const q = query(
+                    collection(db, "usernames"),
+                    where("username_lower", "==", username.toLowerCase())
+                );
+                if (!(await getDocs(q)).empty) {
+                    alert("Username is already taken! Please choose another.");
+                    return;
+                }
+
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await updateProfile(userCredential.user, { displayName: username, photoURL: DEFAULT_PFP });
+
+                // SECURITY: gems locked to 0 on create — Firestore rule enforces this
+                await setDoc(doc(db, "usernames", userCredential.user.uid), {
+                    username:       username,
+                    username_lower: username.toLowerCase(),
+                    gems:           0,
+                    avatar:         DEFAULT_PFP
+                });
+
+                await sendEmailVerification(userCredential.user);
                 await signOut(auth);
-                clearLoginCookie();
-                if(userDropdown) userDropdown.classList.remove('show');
-                if(userPill) userPill.classList.remove('active');
-            } catch (error) {}
-        });
-    }
 
-    onAuthStateChanged(auth, async (user) => {
+                localStorage.setItem('starryverse_account_count', (accountCount + 1).toString());
+                alert("Registration successful! Check your email for the verification link.");
+                closeModal(authModal);
+            }
+        } catch (error) {
+            // Surface friendly messages; avoid leaking raw Firebase error internals
+            const friendlyErrors = {
+                'auth/email-already-in-use':   'That email is already registered.',
+                'auth/weak-password':           'Password must be at least 6 characters.',
+                'auth/invalid-email':           'Please enter a valid email address.',
+                'auth/wrong-password':          'Incorrect password.',
+                'auth/user-not-found':          'No account found with that email.',
+                'auth/too-many-requests':       'Too many attempts. Please try again later.',
+            };
+            alert(friendlyErrors[error.code] || "An error occurred. Please try again.");
+        } finally {
+            submitBtn.disabled   = false;
+            submitBtn.innerText  = originalText;
+            submitBtn.style.opacity = "1";
+            submitBtn.style.cursor  = "pointer";
+        }
+    });
+
+    logoutBtn?.addEventListener('click', async e => {
+        e.preventDefault();
+        try {
+            await signOut(auth);
+            clearLoginCookie();
+            userDropdown?.classList.remove('show');
+            userPill?.classList.remove('active');
+        } catch (_) {}
+    });
+
+    // ── Auth state observer ────────────────────────────────────────────────
+    onAuthStateChanged(auth, async user => {
         const userNameDisplay = document.getElementById('userNameDisplay');
-        const userAvatar = document.getElementById('userAvatar');
+        const userAvatar      = document.getElementById('userAvatar');
 
-        if (user && (user.emailVerified || user.providerData.some(p => p.providerId === 'google.com'))) {
-            if (accountNavBtn) accountNavBtn.style.display = 'none';
-            if (userPill) userPill.style.display = 'flex';
-            
-            const displayName = user.displayName || "User";
-            if (userNameDisplay) userNameDisplay.innerText = displayName;
-            if (userAvatar) userAvatar.src = user.photoURL || DEFAULT_PFP;
+        const isVerified = user && (user.emailVerified || user.providerData.some(p => p.providerId === 'google.com'));
+
+        if (isVerified) {
+            accountNavBtn && (accountNavBtn.style.display = 'none');
+            userPill      && (userPill.style.display      = 'flex');
+
+            if (userNameDisplay) userNameDisplay.innerText = user.displayName || "User";
+            if (userAvatar)      userAvatar.src            = user.photoURL    || DEFAULT_PFP;
 
             try {
                 const userDoc = await getDoc(doc(db, "usernames", user.uid));
                 if (userDoc.exists()) {
                     const data = userDoc.data();
-                    gemCountDisplay.innerText = data.gems !== undefined ? data.gems : 0;
-                    gemsPill.style.display = 'flex';
-                    if (data.avatar && userAvatar) userAvatar.src = data.avatar;
+                    // Read gems from Firestore (read-only from client perspective)
+                    if (gemCountDisplay) gemCountDisplay.innerText = data.gems ?? 0;
+                    if (gemsPill)        gemsPill.style.display    = 'flex';
+                    if (data.avatar && userAvatar) userAvatar.src  = data.avatar;
                 }
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            }
+            } catch (_) {}
+
             attachUISounds();
         } else {
-            if (accountNavBtn) accountNavBtn.style.display = 'inline-block';
-            if (userPill) userPill.style.display = 'none';
-            if (gemsPill) gemsPill.style.display = 'none';
+            accountNavBtn && (accountNavBtn.style.display = 'inline-block');
+            userPill      && (userPill.style.display      = 'none');
+            gemsPill      && (gemsPill.style.display      = 'none');
         }
     });
 });
