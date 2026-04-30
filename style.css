@@ -3,7 +3,7 @@
     /* Light Mode */
     --bg-main: #f0f4f8;
     --bg-card: #ffffff;
-    --nav-bg: rgba(255, 255, 255, 0.85); /* Proper transparency */
+    --nav-bg: rgba(255, 255, 255, 0.85); 
     --text-main: #1e293b;
     --text-muted: #64748b;
     --border: #e2e8f0;
@@ -20,7 +20,7 @@
         /* Dark Mode */
         --bg-main: #0f172a;
         --bg-card: #1e293b;
-        --nav-bg: rgba(30, 41, 59, 0.85); /* Proper transparency */
+        --nav-bg: rgba(30, 41, 59, 0.85); 
         --text-main: #f8fafc;
         --text-muted: #94a3b8;
         --border: #334155;
@@ -68,10 +68,10 @@ a {
     gap: 8px;
 }
 
-/* NAVBAR FIX */
+/* NAVBAR */
 .navbar-wrapper {
     position: fixed;
-    top: 50px; /* Pushed down to clear the banner */
+    top: 50px; 
     width: 100%;
     display: flex;
     justify-content: center;
@@ -185,7 +185,7 @@ a {
     align-items: center;
     gap: 10px;
     padding: 10px 15px;
-    color: #ef4444; /* Force red text */
+    color: #ef4444; 
     font-weight: 600;
     font-size: 14px;
     border-radius: 8px;
@@ -296,9 +296,9 @@ a {
 
 .hero-image-pill img {
     width: 100%;
-    max-height: 400px; /* Constrains the image size */
+    max-height: 400px; 
     object-fit: cover;
-    object-position: top; /* Keeps the top part of the UI visible */
+    object-position: top; 
     display: block;
 }
 
@@ -434,7 +434,7 @@ a {
     font-size: 14px;
 }
 
-/* MODAL FIX - PROPER FIXED OVERLAY */
+/* MODAL FIX */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -443,7 +443,7 @@ a {
     height: 100vh;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(5px);
-    display: none; /* Hidden by default */
+    display: none; 
     align-items: center;
     justify-content: center;
     z-index: 9999;
@@ -452,7 +452,7 @@ a {
 }
 
 .modal-overlay.active {
-    display: flex; /* Flex is added via JS */
+    display: flex; 
 }
 
 .modal-content-pill {
@@ -530,7 +530,7 @@ a {
     position: relative;
 }
 
-/* Fixed Input Styling inside Modal */
+/* Fixed Input Styling */
 .auth-form input {
     width: 100%;
     padding: 14px 16px;
@@ -582,5 +582,5 @@ a {
     .features-grid-extended { grid-template-columns: 1fr; }
     .navbar-pill { padding: 10px 15px; justify-content: space-between; }
     .nav-links { gap: 10px; }
-    .nav-links .nav-link { display: none; } /* Hide text links on mobile, keep button */
+    .nav-links .nav-link { display: none; } 
 }
