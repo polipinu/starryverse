@@ -215,6 +215,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
 
+                    // Backend character limit check
+                    if (username.length > 12) {
+                        alert("Username cannot be longer than 12 characters.");
+                        return;
+                    }
+
+                    if (username.length === 0) {
+                        alert("Username cannot be empty.");
+                        return;
+                    }
+
                     // 1. Check if Username Exists in Firestore
                     const usernamesRef = collection(db, "usernames");
                     const q = query(usernamesRef, where("username_lower", "==", username.toLowerCase()));
