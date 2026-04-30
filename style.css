@@ -152,6 +152,7 @@ a {
 }
 
 
+.gems-pill-ui {
     display: flex;
     align-items: center;
     gap: 6px;
