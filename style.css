@@ -155,11 +155,10 @@ a {
 .gems-pill-ui {
     display: flex;
     align-items: center;
-    gap: 6px;
-    
+    gap: 8px;
+    background: var(--bg-card);
     border: 1px solid var(--border);
-    
-    padding: 3px 12px 3px 6px;
+    padding: 4px 12px 4px 4px;
     border-radius: 50px;
     font-weight: 700;
     font-size: 14px;
@@ -167,8 +166,9 @@ a {
 }
 
 .gems-pill-ui img {
-    width: 22px;
-    height: 22px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
     object-fit: contain;
 }
 
