@@ -19,8 +19,10 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
 
-// Scroll Animations
+// Wait for DOM to load before attaching events
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // --- Scroll Animations ---
     const observerOptions = {
         threshold: 0.1, 
         rootMargin: "0px 0px -50px 0px"
@@ -36,161 +38,178 @@ document.addEventListener('DOMContentLoaded', () => {
     }, observerOptions);
 
     document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
-});
 
-// We must attach functions to the window object so inline HTML onclicks can find them in module scripts
-window.openModal = function() {
-    const modal = document.getElementById('authModal');
-    modal.style.display = 'flex';
-    setTimeout(() => {
-        modal.style.opacity = '1';
-        modal.classList.add('active');
-    }, 10);
-};
-
-window.closeModal = function() {
-    const modal = document.getElementById('authModal');
-    modal.style.opacity = '0';
-    modal.classList.remove('active');
-    setTimeout(() => {
-        modal.style.display = 'none';
-    }, 300);
-};
-
-window.showWipAlert = function() {
-    alert("Starryverse social logins are currently a work in progress!");
-};
-
-// Close on background click
-window.onclick = function(event) {
-    const modal = document.getElementById('authModal');
-    const dropdown = document.getElementById('userDropdown');
+    // --- DOM Elements ---
+    const accountNavBtn = document.getElementById('accountNavBtn');
+    const authModal = document.getElementById('authModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const googleWipBtn = document.getElementById('googleWipBtn');
+    const discordWipBtn = document.getElementById('discordWipBtn');
+    const authToggleText = document.getElementById('authToggleText');
     const userPill = document.getElementById('userPill');
-
-    // Close Auth modal if clicking outside
-    if (event.target === modal) {
-        window.closeModal();
+    const userDropdown = document.getElementById('userDropdown');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const authForm = document.getElementById('authForm');
+    
+    // --- Modal Logic ---
+    function openModal() {
+        authModal.style.display = 'flex';
+        setTimeout(() => {
+            authModal.style.opacity = '1';
+            authModal.classList.add('active');
+        }, 10);
     }
 
-    // Close Dropdown if clicking outside
-    if (dropdown && dropdown.classList.contains('show') && userPill && !userPill.contains(event.target)) {
-        dropdown.classList.remove('show');
-        userPill.classList.remove('active');
+    function closeModal() {
+        authModal.style.opacity = '0';
+        authModal.classList.remove('active');
+        setTimeout(() => {
+            authModal.style.display = 'none';
+        }, 300);
     }
-};
 
-// --- Auth System Logic ---
-let isLoginMode = true;
-
-window.toggleAuthMode = function() {
-    isLoginMode = !isLoginMode;
-    const title = document.getElementById('authTitle');
-    const submitBtn = document.getElementById('authSubmitBtn');
-    const toggleText = document.getElementById('authToggleText');
-    const usernameInput = document.getElementById('authUsername');
-
-    if (isLoginMode) {
-        title.innerText = "Welcome Back";
-        submitBtn.innerText = "Sign In";
-        toggleText.innerText = "Need an account? Register";
-        usernameInput.style.display = "none";
-        usernameInput.removeAttribute('required');
-    } else {
-        title.innerText = "Create Account";
-        submitBtn.innerText = "Register";
-        toggleText.innerText = "Already have an account? Sign In";
-        usernameInput.style.display = "block";
-        usernameInput.setAttribute('required', 'true');
+    if(accountNavBtn) {
+        accountNavBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openModal();
+        });
     }
-};
 
-// Cookie Helpers
-function setLoginCookie() {
-    let date = new Date();
-    date.setTime(date.getTime() + (7*24*60*60*1000)); // 7 days expiration
-    document.cookie = "starryverse_session=true; expires=" + date.toUTCString() + "; path=/";
-}
+    if(closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeModal);
+    }
 
-function clearLoginCookie() {
-    document.cookie = "starryverse_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-}
+    // Work in Progress Alerts
+    const showWipAlert = () => alert("Starryverse social logins are currently a work in progress!");
+    if(googleWipBtn) googleWipBtn.addEventListener('click', showWipAlert);
+    if(discordWipBtn) discordWipBtn.addEventListener('click', showWipAlert);
 
-// Handle Form Submission
-document.getElementById('authForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('authEmail').value;
-    const password = document.getElementById('authPassword').value;
-    const usernameInput = document.getElementById('authUsername');
-    const username = usernameInput ? usernameInput.value : "User";
+    // Global Click Listener (Close modal/dropdown on outside click)
+    window.addEventListener('click', (event) => {
+        if (event.target === authModal) {
+            closeModal();
+        }
+        if (userDropdown && userDropdown.classList.contains('show') && userPill && !userPill.contains(event.target)) {
+            userDropdown.classList.remove('show');
+            userPill.classList.remove('active');
+        }
+    });
 
-    try {
-        if (isLoginMode) {
-            // Login
-            await signInWithEmailAndPassword(auth, email, password);
-            setLoginCookie();
-            window.closeModal();
-        } else {
-            // Register & check device limits
-            if (localStorage.getItem('starryverse_device_registered')) {
-                alert("Registration Failed: Only 1 account is allowed per device.");
-                return;
+    // --- User Pill Dropdown ---
+    if(userPill) {
+        userPill.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(userDropdown) userDropdown.classList.toggle('show');
+            userPill.classList.toggle('active');
+        });
+    }
+
+    // --- Auth System Logic ---
+    let isLoginMode = true;
+
+    if(authToggleText) {
+        authToggleText.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            const title = document.getElementById('authTitle');
+            const submitBtn = document.getElementById('authSubmitBtn');
+            const usernameInput = document.getElementById('authUsername');
+
+            if (isLoginMode) {
+                title.innerText = "Welcome Back";
+                submitBtn.innerText = "Sign In";
+                authToggleText.innerText = "Need an account? Register";
+                usernameInput.style.display = "none";
+                usernameInput.removeAttribute('required');
+            } else {
+                title.innerText = "Create Account";
+                submitBtn.innerText = "Register";
+                authToggleText.innerText = "Already have an account? Sign In";
+                usernameInput.style.display = "block";
+                usernameInput.setAttribute('required', 'true');
             }
+        });
+    }
 
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            await updateProfile(userCredential.user, { displayName: username });
+    // Cookie Helpers
+    function setLoginCookie() {
+        let date = new Date();
+        date.setTime(date.getTime() + (7*24*60*60*1000)); // 7 days expiration
+        document.cookie = "starryverse_session=true; expires=" + date.toUTCString() + "; path=/";
+    }
+
+    function clearLoginCookie() {
+        document.cookie = "starryverse_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
+
+    // Form Submission
+    if(authForm) {
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const usernameInput = document.getElementById('authUsername');
+            const username = usernameInput ? usernameInput.value : "User";
+
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    setLoginCookie();
+                    closeModal();
+                } else {
+                    if (localStorage.getItem('starryverse_device_registered')) {
+                        alert("Registration Failed: Only 1 account is allowed per device.");
+                        return;
+                    }
+
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await updateProfile(userCredential.user, { displayName: username });
+                    
+                    localStorage.setItem('starryverse_device_registered', 'true');
+                    setLoginCookie();
+                    closeModal();
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+    }
+
+    // Logout
+    if(logoutBtn) {
+        logoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await signOut(auth);
+                clearLoginCookie();
+                if(userDropdown) userDropdown.classList.remove('show');
+                if(userPill) userPill.classList.remove('active');
+            } catch (error) {
+                console.error("Logout Error:", error);
+            }
+        });
+    }
+
+    // Auth State Observer
+    onAuthStateChanged(auth, (user) => {
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const userAvatar = document.getElementById('userAvatar');
+
+        if (user) {
+            // Logged In
+            if (accountNavBtn) accountNavBtn.style.display = 'none';
+            if (userPill) userPill.style.display = 'flex';
             
-            localStorage.setItem('starryverse_device_registered', 'true');
-            setLoginCookie();
-            window.closeModal();
+            const displayName = user.displayName || "User";
+            if (userNameDisplay) userNameDisplay.innerText = displayName;
+            
+            if (userAvatar) {
+                userAvatar.src = `https://ui-avatars.com/api/?name=${displayName}&background=3b82f6&color=fff&rounded=true&bold=true`;
+            }
+        } else {
+            // Logged Out
+            if (accountNavBtn) accountNavBtn.style.display = 'inline-block';
+            if (userPill) userPill.style.display = 'none';
         }
-    } catch (error) {
-        alert(error.message);
-    }
-});
-
-// Dropdown UI Interaction
-window.toggleDropdown = function(event) {
-    event.stopPropagation();
-    const dropdown = document.getElementById('userDropdown');
-    const pill = document.getElementById('userPill');
-    if(dropdown) dropdown.classList.toggle('show');
-    if(pill) pill.classList.toggle('active');
-};
-
-window.logoutUser = async function(event) {
-    event.preventDefault();
-    try {
-        await signOut(auth);
-        clearLoginCookie();
-        // Fallback reload if UI doesn't update immediately
-        window.location.reload(); 
-    } catch (error) {
-        console.error("Logout Error:", error);
-    }
-};
-
-// Listen for Auth State Changes
-onAuthStateChanged(auth, (user) => {
-    // If you are using the original HTML, it might not have 'accountNav', so we use querySelector as fallback
-    const accountNav = document.getElementById('accountNav') || document.querySelector('a[onclick="openModal()"]');
-    const userPill = document.getElementById('userPill');
-    const userNameDisplay = document.getElementById('userNameDisplay');
-    const userAvatar = document.getElementById('userAvatar');
-
-    if (user) {
-        // Logged In
-        if (accountNav) accountNav.style.display = 'none';
-        if (userPill) userPill.style.display = 'flex';
-        
-        const displayName = user.displayName || "User";
-        if (userNameDisplay) userNameDisplay.innerText = displayName;
-        
-        if (userAvatar) {
-            userAvatar.src = `https://ui-avatars.com/api/?name=${displayName}&background=3b82f6&color=fff&rounded=true&bold=true`;
-        }
-    } else {
-        // Logged Out
-        if (accountNav) accountNav.style.display = 'inline-block';
-        if (userPill) userPill.style.display = 'none';
-    }
+    });
 });
