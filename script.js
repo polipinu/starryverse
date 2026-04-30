@@ -1,7 +1,26 @@
 // Import the functions you need from the SDKs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { 
+    getAuth, 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword, 
+    onAuthStateChanged, 
+    signOut, 
+    updateProfile, 
+    GoogleAuthProvider, 
+    signInWithPopup, 
+    sendEmailVerification 
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { 
+    getFirestore, 
+    doc, 
+    setDoc, 
+    collection, 
+    query, 
+    where, 
+    getDocs 
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -14,10 +33,11 @@ const firebaseConfig = {
     measurementId: "G-EWXBVFJ47Q"
 };
 
-// Initialize Firebase
+// Initialize Firebase & Firestore
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 // Wait for DOM to load before attaching events
 document.addEventListener('DOMContentLoaded', () => {
@@ -43,8 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const accountNavBtn = document.getElementById('accountNavBtn');
     const authModal = document.getElementById('authModal');
     const closeModalBtn = document.getElementById('closeModalBtn');
-    const googleWipBtn = document.getElementById('googleWipBtn');
-    const discordWipBtn = document.getElementById('discordWipBtn');
+    const googleAuthBtn = document.getElementById('googleAuthBtn');
     const authToggleText = document.getElementById('authToggleText');
     const userPill = document.getElementById('userPill');
     const userDropdown = document.getElementById('userDropdown');
@@ -68,27 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     }
 
-    if(accountNavBtn) {
-        accountNavBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            openModal();
-        });
-    }
-
-    if(closeModalBtn) {
-        closeModalBtn.addEventListener('click', closeModal);
-    }
-
-    // Work in Progress Alerts
-    const showWipAlert = () => alert("Starryverse social logins are currently a work in progress!");
-    if(googleWipBtn) googleWipBtn.addEventListener('click', showWipAlert);
-    if(discordWipBtn) discordWipBtn.addEventListener('click', showWipAlert);
+    if(accountNavBtn) accountNavBtn.addEventListener('click', (e) => { e.preventDefault(); openModal(); });
+    if(closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
 
     // Global Click Listener (Close modal/dropdown on outside click)
     window.addEventListener('click', (event) => {
-        if (event.target === authModal) {
-            closeModal();
-        }
+        if (event.target === authModal) closeModal();
         if (userDropdown && userDropdown.classList.contains('show') && userPill && !userPill.contains(event.target)) {
             userDropdown.classList.remove('show');
             userPill.classList.remove('active');
@@ -134,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Cookie Helpers
     function setLoginCookie() {
         let date = new Date();
-        date.setTime(date.getTime() + (7*24*60*60*1000)); // 7 days expiration
+        date.setTime(date.getTime() + (7*24*60*60*1000));
         document.cookie = "starryverse_session=true; expires=" + date.toUTCString() + "; path=/";
     }
 
@@ -142,31 +146,79 @@ document.addEventListener('DOMContentLoaded', () => {
         document.cookie = "starryverse_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     }
 
-    // Form Submission
+    // Google Sign In
+    if(googleAuthBtn) {
+        googleAuthBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+                setLoginCookie();
+                closeModal();
+            } catch (error) {
+                alert("Google Sign-In Error: " + error.message);
+            }
+        });
+    }
+
+    // Form Submission (Email/Password)
     if(authForm) {
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('authEmail').value;
             const password = document.getElementById('authPassword').value;
             const usernameInput = document.getElementById('authUsername');
-            const username = usernameInput ? usernameInput.value : "User";
+            const username = usernameInput ? usernameInput.value.trim() : "User";
 
             try {
                 if (isLoginMode) {
-                    await signInWithEmailAndPassword(auth, email, password);
+                    // --- LOGIN LOGIC ---
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    
+                    // Check if the email is verified
+                    if (!userCredential.user.emailVerified) {
+                        await signOut(auth); // Log them back out immediately
+                        alert("Please check your email and verify your account before logging in.");
+                        return;
+                    }
+
                     setLoginCookie();
                     closeModal();
                 } else {
+                    // --- REGISTER LOGIC ---
                     if (localStorage.getItem('starryverse_device_registered')) {
                         alert("Registration Failed: Only 1 account is allowed per device.");
                         return;
                     }
 
+                    // 1. Check if Username Exists in Firestore
+                    const usernamesRef = collection(db, "usernames");
+                    const q = query(usernamesRef, where("username_lower", "==", username.toLowerCase()));
+                    const querySnapshot = await getDocs(q);
+
+                    if (!querySnapshot.empty) {
+                        alert("Username is already taken! Please choose another one.");
+                        return; // Stop registration
+                    }
+
+                    // 2. Create Account
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     await updateProfile(userCredential.user, { displayName: username });
                     
+                    // 3. Save new Username to Firestore
+                    await setDoc(doc(db, "usernames", userCredential.user.uid), {
+                        username: username,
+                        username_lower: username.toLowerCase()
+                    });
+                    
+                    // 4. Send the verification email
+                    await sendEmailVerification(userCredential.user);
+                    
+                    // 5. Sign them out immediately so they are forced to verify
+                    await signOut(auth);
+                    
                     localStorage.setItem('starryverse_device_registered', 'true');
-                    setLoginCookie();
+                    alert("Registration successful! We have sent a verification link to your email. Please verify before logging in.");
                     closeModal();
                 }
             } catch (error) {
@@ -195,8 +247,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const userNameDisplay = document.getElementById('userNameDisplay');
         const userAvatar = document.getElementById('userAvatar');
 
-        if (user) {
-            // Logged In
+        if (user && user.emailVerified) {
+            // Logged In & Verified
             if (accountNavBtn) accountNavBtn.style.display = 'none';
             if (userPill) userPill.style.display = 'flex';
             
@@ -207,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 userAvatar.src = `https://ui-avatars.com/api/?name=${displayName}&background=3b82f6&color=fff&rounded=true&bold=true`;
             }
         } else {
-            // Logged Out
+            // Logged Out (or logged in but unverified)
             if (accountNavBtn) accountNavBtn.style.display = 'inline-block';
             if (userPill) userPill.style.display = 'none';
         }
