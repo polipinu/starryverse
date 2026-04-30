@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
 });
 
-// Since we are using <script type="module">, we must attach functions to the window object so inline HTML onclicks can find them.
+// We must attach functions to the window object so inline HTML onclicks can find them in module scripts
 window.openModal = function() {
     const modal = document.getElementById('authModal');
     modal.style.display = 'flex';
@@ -46,7 +46,7 @@ window.openModal = function() {
         modal.style.opacity = '1';
         modal.classList.add('active');
     }, 10);
-}
+};
 
 window.closeModal = function() {
     const modal = document.getElementById('authModal');
@@ -55,11 +55,11 @@ window.closeModal = function() {
     setTimeout(() => {
         modal.style.display = 'none';
     }, 300);
-}
+};
 
 window.showWipAlert = function() {
     alert("Starryverse social logins are currently a work in progress!");
-}
+};
 
 // Close on background click
 window.onclick = function(event) {
@@ -73,11 +73,11 @@ window.onclick = function(event) {
     }
 
     // Close Dropdown if clicking outside
-    if (dropdown && dropdown.classList.contains('show') && !userPill.contains(event.target)) {
+    if (dropdown && dropdown.classList.contains('show') && userPill && !userPill.contains(event.target)) {
         dropdown.classList.remove('show');
         userPill.classList.remove('active');
     }
-}
+};
 
 // --- Auth System Logic ---
 let isLoginMode = true;
@@ -102,9 +102,9 @@ window.toggleAuthMode = function() {
         usernameInput.style.display = "block";
         usernameInput.setAttribute('required', 'true');
     }
-}
+};
 
-// Cookie Helper Functions (Satisfies prompt request)
+// Cookie Helpers
 function setLoginCookie() {
     let date = new Date();
     date.setTime(date.getTime() + (7*24*60*60*1000)); // 7 days expiration
@@ -116,11 +116,12 @@ function clearLoginCookie() {
 }
 
 // Handle Form Submission
-document.getElementById('authForm').addEventListener('submit', async (e) => {
+document.getElementById('authForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('authEmail').value;
     const password = document.getElementById('authPassword').value;
-    const username = document.getElementById('authUsername').value;
+    const usernameInput = document.getElementById('authUsername');
+    const username = usernameInput ? usernameInput.value : "User";
 
     try {
         if (isLoginMode) {
@@ -129,7 +130,7 @@ document.getElementById('authForm').addEventListener('submit', async (e) => {
             setLoginCookie();
             window.closeModal();
         } else {
-            // Register & check device limits (1 account per device via LocalStorage flag)
+            // Register & check device limits
             if (localStorage.getItem('starryverse_device_registered')) {
                 alert("Registration Failed: Only 1 account is allowed per device.");
                 return;
@@ -138,7 +139,6 @@ document.getElementById('authForm').addEventListener('submit', async (e) => {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(userCredential.user, { displayName: username });
             
-            // Set flag to prevent future registrations from this device
             localStorage.setItem('starryverse_device_registered', 'true');
             setLoginCookie();
             window.closeModal();
@@ -151,40 +151,46 @@ document.getElementById('authForm').addEventListener('submit', async (e) => {
 // Dropdown UI Interaction
 window.toggleDropdown = function(event) {
     event.stopPropagation();
-    document.getElementById('userDropdown').classList.toggle('show');
-    document.getElementById('userPill').classList.toggle('active');
-}
+    const dropdown = document.getElementById('userDropdown');
+    const pill = document.getElementById('userPill');
+    if(dropdown) dropdown.classList.toggle('show');
+    if(pill) pill.classList.toggle('active');
+};
 
 window.logoutUser = async function(event) {
     event.preventDefault();
     try {
         await signOut(auth);
         clearLoginCookie();
+        // Fallback reload if UI doesn't update immediately
+        window.location.reload(); 
     } catch (error) {
         console.error("Logout Error:", error);
     }
-}
+};
 
-// Listen for Auth State Changes to update UI globally across reloads
+// Listen for Auth State Changes
 onAuthStateChanged(auth, (user) => {
-    const accountNav = document.getElementById('accountNav');
+    // If you are using the original HTML, it might not have 'accountNav', so we use querySelector as fallback
+    const accountNav = document.getElementById('accountNav') || document.querySelector('a[onclick="openModal()"]');
     const userPill = document.getElementById('userPill');
     const userNameDisplay = document.getElementById('userNameDisplay');
     const userAvatar = document.getElementById('userAvatar');
 
     if (user) {
         // Logged In
-        accountNav.style.display = 'none';
-        userPill.style.display = 'flex';
+        if (accountNav) accountNav.style.display = 'none';
+        if (userPill) userPill.style.display = 'flex';
         
         const displayName = user.displayName || "User";
-        userNameDisplay.innerText = displayName;
+        if (userNameDisplay) userNameDisplay.innerText = displayName;
         
-        // Using a reliable generic default avatar api that matches the user's name
-        userAvatar.src = `https://ui-avatars.com/api/?name=${displayName}&background=3b82f6&color=fff&rounded=true&bold=true`;
+        if (userAvatar) {
+            userAvatar.src = `https://ui-avatars.com/api/?name=${displayName}&background=3b82f6&color=fff&rounded=true&bold=true`;
+        }
     } else {
         // Logged Out
-        accountNav.style.display = 'inline-block';
-        userPill.style.display = 'none';
+        if (accountNav) accountNav.style.display = 'inline-block';
+        if (userPill) userPill.style.display = 'none';
     }
 });
