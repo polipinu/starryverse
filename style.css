@@ -130,13 +130,17 @@ a {
 /* Ensure the navbar pill doesn't wrap on smaller screens */
 .navbar-pill {
     white-space: nowrap;
-    overflow-x: auto;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    overflow: visible; /* Must be visible so the dropdown isn't clipped */
 }
 
-.navbar-pill::-webkit-scrollbar {
-    display: none; /* Chrome, Safari and Opera */
+.nav-links {
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.nav-links::-webkit-scrollbar {
+    display: none;
 }
 .gems-pill-ui {
     display: flex;
