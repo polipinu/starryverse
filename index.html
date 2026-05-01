@@ -6,7 +6,9 @@
     <title>Starryverse | Create Your Ultimate Web Game</title>
     <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    
+    <!-- Link to the new main CSS file -->
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 
@@ -16,7 +18,6 @@
 
     <nav class="navbar-wrapper">
         <div class="navbar-pill">
-
             <div class="logo">
                 <a href="#">
                     <svg width="180" height="40" viewBox="0 0 180 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -64,7 +65,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </nav>
 
@@ -86,12 +86,10 @@
         </section>
     </div>
 
-    <!-- NEW: Games Showcase Section -->
+    <!-- Games Showcase Section -->
     <section class="games-showcase container fade-in-up">
         <h2 class="section-title" style="text-align: left; margin-bottom: 24px;">Popular Worlds</h2>
         <div class="games-grid">
-            
-            <!-- Game 1 -->
             <div class="game-card">
                 <div class="game-img-wrapper">
                     <img src="https://www.jackhowardcolor.com/wp-content/uploads/2025/09/elementor-placeholder-image.png" alt="Zoombies.lol">
@@ -105,8 +103,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Game 2 -->
             <div class="game-card">
                 <div class="game-img-wrapper">
                     <img src="https://cache.modd.io/asset/spriteImage/1600484735037_hut_hut_2.jpg" alt="Hut Hut">
@@ -120,8 +116,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Game 3 -->
             <div class="game-card">
                 <div class="game-img-wrapper">
                     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAWV_YC_oMStz0frDV1qM1p0x1O2QdRwTqkQ&s" alt="Lab Escape">
@@ -135,8 +129,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Game 4 -->
             <div class="game-card">
                 <div class="game-img-wrapper">
                     <img src="https://i.ytimg.com/vi/nKc8ogjfUk4/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCkOWvEousHIqnKLiexQMXbsZNilg" alt="Halloween Map">
@@ -150,8 +142,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Game 5 -->
             <div class="game-card">
                 <div class="game-img-wrapper">
                     <img src="https://cache.modd.io/asset/spriteImage/1534976961314_banner.png" alt="Christmas Town">
@@ -165,8 +155,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Game 6 -->
             <div class="game-card">
                 <div class="game-img-wrapper">
                     <img src="https://www.jackhowardcolor.com/wp-content/uploads/2025/09/elementor-placeholder-image.png" alt="Mansion Map">
@@ -180,7 +168,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </section>
 
@@ -279,7 +266,6 @@
             <h2 class="modal-title">Profile Picture</h2>
             
             <div class="avatar-grid" id="avatarGrid">
-                <!-- 5 Default Options -->
                 <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg" class="avatar-option selected" data-url="https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg" alt="Default 1">
                 <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Felix" class="avatar-option" data-url="https://api.dicebear.com/7.x/adventurer/svg?seed=Felix" alt="Default 2">
                 <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Aneka" class="avatar-option" data-url="https://api.dicebear.com/7.x/adventurer/svg?seed=Aneka" alt="Default 3">
@@ -289,12 +275,10 @@
 
             <div class="divider"><span>OR CUSTOM LINK</span></div>
             
-            <!-- User Restraint Explanation UI -->
             <div style="background: rgba(59, 130, 246, 0.1); border-left: 3px solid var(--primary); padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; color: var(--text-muted); line-height: 1.4;">
                 <i class="fa-solid fa-circle-info" style="color: var(--primary);"></i> <b>Temporary Workaround:</b> Direct file uploads are currently paused for server upgrades. Please paste a direct image link from an external host (e.g., ImgBB, Imgur, or Discord).
             </div>
             
-            <!-- URL Input and Preview Button -->
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <input type="url" id="customAvatarUrlInput" placeholder="https://..." style="flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none;">
                 <button class="btn-pill btn-secondary" id="previewUrlBtn">Preview</button>
@@ -308,6 +292,7 @@
         </div>
     </div>
 
-    <script type="module" src="script.js"></script>
+    <!-- Link to the new main JS file -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

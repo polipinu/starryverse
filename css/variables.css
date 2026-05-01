@@ -1,0 +1,32 @@
+/* AUTO THEME DETECTION WITH FIX FOR TRANSPARENCY */
+:root {
+    /* Light Mode */
+    --bg-main: #f0f4f8;
+    --bg-card: #ffffff;
+    --nav-bg: rgba(255, 255, 255, 0.85); 
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --accent-glow: rgba(59, 130, 246, 0.2);
+    --banner-bg: #f59e0b;
+    --banner-text: #451a03;
+    --input-bg: #f8fafc;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Dark Mode */
+        --bg-main: #0f172a;
+        --bg-card: #1e293b;
+        --nav-bg: rgba(30, 41, 59, 0.85); 
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border: #334155;
+        --accent-glow: rgba(59, 130, 246, 0.4);
+        --banner-bg: #f59e0b;
+        --banner-text: #451a03;
+        --input-bg: #0b1121;
+    }
+}

@@ -1,0 +1,188 @@
+/* TOP BANNER */
+.top-banner {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: var(--banner-bg);
+    color: var(--banner-text);
+    padding: 8px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    z-index: 1001;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+/* NAVBAR */
+.navbar-wrapper {
+    position: fixed;
+    top: 50px; 
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 1000;
+    padding: 0 20px;
+}
+
+.navbar-pill {
+    background: var(--nav-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    padding: 10px 24px;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    max-width: 1000px;
+    width: 100%;
+    overflow: visible;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+    justify-content: center;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.nav-links::-webkit-scrollbar {
+    display: none;
+}
+
+.svg-text {
+    fill: var(--text-main);
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 14px; 
+    transition: all 0.2s;
+}
+
+.nav-link i {
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.nav-link:hover {
+    color: var(--primary);
+}
+
+.nav-link:hover i {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.user-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* User Pill & Dropdown Styling */
+.user-pill-ui {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 4px 12px 4px 4px;
+    border-radius: 50px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.user-pill-ui:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.user-pill-ui img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-pill-ui span {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-main);
+}
+
+.dropdown-icon {
+    font-size: 10px;
+    color: var(--text-muted);
+    transition: transform 0.3s ease;
+}
+
+.user-pill-ui.active .dropdown-icon {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 130%;
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px;
+    min-width: 170px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    color: var(--text-main); 
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+    text-decoration: none;
+}
+
+.dropdown-link:hover {
+    background: var(--bg-main);
+}
+
+.logout-link {
+    color: #ef4444; 
+    margin-top: 5px;
+    border-top: 1px solid var(--border);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.logout-link:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
