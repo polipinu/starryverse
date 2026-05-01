@@ -7,7 +7,6 @@
     
     <link rel="icon" type="image/png" href="assets/logo.png">
 
-    <!-- UPDATED: Added Lato, Open Sans, and Nunito fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Nunito:wght@400;600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -25,7 +24,6 @@
             <div class="logo">
                 <a href="#" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
                     <img src="assets/logo.png" alt="Starryverse Logo" style="height: 32px; width: auto; object-fit: contain;">
-                    <!-- UPDATED: Changed logo text to Lato -->
                     <span style="font-family: 'Lato', sans-serif; font-weight: 900; font-size: 22px; color: var(--text-main);">Starryverse</span>
                 </a>
             </div>
@@ -46,7 +44,6 @@
             </div>
 
             <div class="user-group">
-                <!-- NEW: Settings Gear Icon -->
                 <a href="#" class="nav-link" id="settingsNavBtn" style="padding: 0 10px; font-size: 18px;">
                     <i class="fa-solid fa-gear"></i>
                 </a>
@@ -240,7 +237,8 @@
             <div class="footer-links">
                 <a href="https://starryverse.site/play/zoombiesio">Play</a>
                 <a href="https://starryverse.site/editor">Editor</a>
-                <a href="mailto:starryversesite@outlook.com">Support</a>
+                <!-- UPDATED: Replaced email link with the new Support Modal Trigger -->
+                <a href="#" id="openSupportBtn">Support</a>
             </div>
             <p>&copy; 2026 Starryverse</p>
         </div>
@@ -303,7 +301,7 @@
         </div>
     </div>
 
-    <!-- NEW: Settings Modal -->
+    <!-- Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-content-pill">
             <button class="close-btn" id="closeSettingsModalBtn">&times;</button>
@@ -344,6 +342,43 @@
             </form>
         </div>
     </div>
+
+    <!-- NEW: Support & Contact Modal -->
+    <div class="modal-overlay" id="supportModal">
+        <div class="modal-content-pill">
+            <button class="close-btn" id="closeSupportModalBtn">&times;</button>
+            <h2 class="modal-title" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fa-brands fa-discord" style="color: #5865F2;"></i> Contact Support
+            </h2>
+            
+            <p style="text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+                The fastest way to get help or ask questions is through our community Discord.
+            </p>
+
+            <a href="https://discord.gg/dsRQDsfGx7" target="_blank" class="social-pill" style="background: #5865F2; margin-bottom: 20px; text-decoration: none;">
+                Join the Discord Server
+            </a>
+
+            <div class="divider"><span>OR MESSAGE DIRECTLY</span></div>
+            
+            <label style="font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: block;">Discord Username</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <input type="text" value="thestarryverse" readonly id="discordUserCopy" style="flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); font-size: 15px; outline: none; text-align: center; font-weight: 600;">
+                <button class="btn-pill btn-secondary" id="copyDiscordBtn" style="padding: 12px 20px;">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Floating Buy Me A Coffee Widget -->
+    <a href="https://buymeacoffee.com/starryverse" target="_blank" class="floating-bmc">
+        <i class="fa-solid fa-mug-hot" style="font-size: 18px;"></i>
+        <span>Support the Project</span>
+        <div class="hearts">
+            <i class="fa-solid fa-heart h1"></i>
+            <i class="fa-solid fa-heart h2"></i>
+            <i class="fa-solid fa-heart h3"></i>
+        </div>
+    </a>
 
     <script type="module" src="js/main.js"></script>
 </body>

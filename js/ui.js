@@ -6,15 +6,12 @@ export function applyPreferences() {
     const font = localStorage.getItem('sv_font') || 'lato';
     const anim = localStorage.getItem('sv_anim') || 'on';
 
-    // Clear all existing overrides
     document.documentElement.className = ''; 
     
-    // Inject selected theme, font, and animation classes directly into the HTML root
     if (theme !== 'dynamic') document.documentElement.classList.add(`theme-${theme}`);
     if (font !== 'lato') document.documentElement.classList.add(`font-${font}`);
     if (anim === 'off') document.documentElement.classList.add('anim-off');
 
-    // Keep the dropdown menus visually in-sync with what is saved
     const themeSelect = document.getElementById('themeSelect');
     const fontSelect = document.getElementById('fontSelect');
     const animSelect = document.getElementById('animSelect');
@@ -24,9 +21,7 @@ export function applyPreferences() {
     if (animSelect) animSelect.value = anim;
 }
 
-// Intercept page load to apply preferences instantly
 applyPreferences();
-
 
 // =========================================
 // UI SOUNDS & MODALS
@@ -78,7 +73,7 @@ export function setupUI() {
     }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
     document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
 
-    // Nav Listeners
+    // Nav & Footer Listeners
     const accountNavBtn = document.getElementById('accountNavBtn');
     const authModal = document.getElementById('authModal');
     
@@ -87,6 +82,9 @@ export function setupUI() {
     
     const settingsNavBtn = document.getElementById('settingsNavBtn');
     const settingsModal = document.getElementById('settingsModal');
+    
+    const supportBtn = document.getElementById('openSupportBtn');
+    const supportModal = document.getElementById('supportModal');
     
     const userPill = document.getElementById('userPill');
     const userDropdown = document.getElementById('userDropdown');
@@ -101,11 +99,15 @@ export function setupUI() {
     settingsNavBtn?.addEventListener('click', e => { e.preventDefault(); openModal(settingsModal); });
     document.getElementById('closeSettingsModalBtn')?.addEventListener('click', () => closeModal(settingsModal));
 
+    supportBtn?.addEventListener('click', e => { e.preventDefault(); openModal(supportModal); });
+    document.getElementById('closeSupportModalBtn')?.addEventListener('click', () => closeModal(supportModal));
+
     // Outside Click closer
     window.addEventListener('click', event => {
         if (event.target === authModal) closeModal(authModal);
         if (event.target === avatarModal) closeModal(avatarModal);
         if (event.target === settingsModal) closeModal(settingsModal);
+        if (event.target === supportModal) closeModal(supportModal);
         
         if (userDropdown?.classList.contains('show') && !userPill?.contains(event.target)) {
             userDropdown.classList.remove('show');
@@ -126,17 +128,36 @@ export function setupUI() {
         const saveBtn = document.getElementById('saveSettingsBtn');
         saveBtn.innerText = "Saved!";
         
-        // Save to browser cache exactly like a permanent cookie
         localStorage.setItem('sv_theme', document.getElementById('themeSelect').value);
         localStorage.setItem('sv_font', document.getElementById('fontSelect').value);
         localStorage.setItem('sv_anim', document.getElementById('animSelect').value);
         
-        // Push the changes to the UI immediately
         applyPreferences();
         
         setTimeout(() => {
             saveBtn.innerText = "Save Preferences";
             closeModal(settingsModal);
-        }, 800); // Close after a tiny delay so they see the "Saved!" text
+        }, 800); 
+    });
+
+    // Copy Discord Username Event
+    const copyDiscordBtn = document.getElementById('copyDiscordBtn');
+    copyDiscordBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        const copyText = document.getElementById('discordUserCopy');
+        
+        // Use browser clipboard API to copy the text
+        navigator.clipboard.writeText(copyText.value).then(() => {
+            copyDiscordBtn.innerText = "Copied!";
+            copyDiscordBtn.classList.add('btn-primary');
+            copyDiscordBtn.classList.remove('btn-secondary');
+            
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                copyDiscordBtn.innerText = "Copy";
+                copyDiscordBtn.classList.remove('btn-primary');
+                copyDiscordBtn.classList.add('btn-secondary');
+            }, 2000);
+        });
     });
 }
