@@ -2,7 +2,7 @@ import { auth, db, DEFAULT_PFP } from './firebase.js';
 import { attachUISounds, closeModal } from './ui.js';
 import { 
     createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, 
-    signOut, updateProfile, GoogleAuthProvider, signInWithPopup, sendEmailVerification 
+    signOut, updateProfile, sendEmailVerification 
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -42,39 +42,19 @@ export function setupAccounts() {
         const usernameInput = document.getElementById('authUsername');
 
         if (isLoginMode) {
-            title.innerText = "Welcome Back"; submitBtn.innerText = "Sign In";
+            title.innerHTML = '<i class="fa-solid fa-user-lock" style="color: var(--primary);"></i> Welcome Back'; 
+            submitBtn.innerText = "Sign In";
             authToggleText.innerText = "Need an account? Register";
             usernameInput.style.display = "none"; usernameInput.removeAttribute('required');
         } else {
-            title.innerText = "Create Account"; submitBtn.innerText = "Register";
+            title.innerHTML = '<i class="fa-solid fa-user-plus" style="color: var(--primary);"></i> Create Account'; 
+            submitBtn.innerText = "Register";
             authToggleText.innerText = "Already have an account? Sign In";
             usernameInput.style.display = "block"; usernameInput.setAttribute('required', 'true');
         }
     });
 
-    // --- Google Auth ---
-    const googleAuthBtn = document.getElementById('googleAuthBtn');
-    googleAuthBtn?.addEventListener('click', async e => {
-        e.preventDefault();
-        const originalHTML = googleAuthBtn.innerHTML;
-        googleAuthBtn.disabled = true; googleAuthBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-        googleAuthBtn.style.opacity = "0.7";
-        
-        try {
-            const userCredential = await signInWithPopup(auth, new GoogleAuthProvider());
-            const userDocRef = doc(db, "usernames", userCredential.user.uid);
-            const userDocSnap = await getDoc(userDocRef);
-
-            if (!userDocSnap.exists()) {
-                const defaultName = (userCredential.user.displayName || "GoogleUser").slice(0, 12);
-                await setDoc(userDocRef, { username: defaultName, username_lower: defaultName.toLowerCase(), gems: 0, avatar: userCredential.user.photoURL || DEFAULT_PFP });
-            }
-            setLoginCookie(); closeModal(authModal);
-        } catch (error) { alert("Google Sign-In Error: " + error.message); } 
-        finally { googleAuthBtn.disabled = false; googleAuthBtn.innerHTML = originalHTML; googleAuthBtn.style.opacity = "1"; }
-    });
-
-    // --- Email Auth ---
+    // --- Email Auth (No Google) ---
     document.getElementById('authForm')?.addEventListener('submit', async e => {
         e.preventDefault();
         const submitBtn = document.getElementById('authSubmitBtn');
@@ -175,7 +155,9 @@ export function setupAccounts() {
     onAuthStateChanged(auth, async user => {
         const userNameDisplay = document.getElementById('userNameDisplay');
         const userAvatar = document.getElementById('userAvatar');
-        const isVerified = user && (user.emailVerified || user.providerData.some(p => p.providerId === 'google.com'));
+        
+        // Removed Google check, now strictly checks email verification
+        const isVerified = user && user.emailVerified;
 
         if (isVerified) {
             document.getElementById('accountNavBtn').style.display = 'none';

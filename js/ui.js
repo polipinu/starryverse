@@ -1,4 +1,36 @@
-// --- UI Sounds ---
+// =========================================
+// PREFERENCES SYSTEM (Runs immediately)
+// =========================================
+export function applyPreferences() {
+    const theme = localStorage.getItem('sv_theme') || 'dynamic';
+    const font = localStorage.getItem('sv_font') || 'lato';
+    const anim = localStorage.getItem('sv_anim') || 'on';
+
+    // Clear all existing overrides
+    document.documentElement.className = ''; 
+    
+    // Inject selected theme, font, and animation classes directly into the HTML root
+    if (theme !== 'dynamic') document.documentElement.classList.add(`theme-${theme}`);
+    if (font !== 'lato') document.documentElement.classList.add(`font-${font}`);
+    if (anim === 'off') document.documentElement.classList.add('anim-off');
+
+    // Keep the dropdown menus visually in-sync with what is saved
+    const themeSelect = document.getElementById('themeSelect');
+    const fontSelect = document.getElementById('fontSelect');
+    const animSelect = document.getElementById('animSelect');
+    
+    if (themeSelect) themeSelect.value = theme;
+    if (fontSelect) fontSelect.value = font;
+    if (animSelect) animSelect.value = anim;
+}
+
+// Intercept page load to apply preferences instantly
+applyPreferences();
+
+
+// =========================================
+// UI SOUNDS & MODALS
+// =========================================
 const sfxHover = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
 const sfxClick = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
 sfxHover.volume = 0.1;
@@ -8,7 +40,7 @@ export function playHoverSound() { sfxHover.currentTime = 0; sfxHover.play().cat
 export function playClickSound() { sfxClick.currentTime = 0; sfxClick.play().catch(() => {}); }
 
 export function attachUISounds() {
-    document.querySelectorAll('a, button, .user-pill-ui, .avatar-option').forEach(el => {
+    document.querySelectorAll('a, button, .user-pill-ui, .avatar-option, .settings-select').forEach(el => {
         el.removeEventListener('mouseenter', playHoverSound);
         el.removeEventListener('click', playClickSound);
         el.addEventListener('mouseenter', playHoverSound);
@@ -16,7 +48,6 @@ export function attachUISounds() {
     });
 }
 
-// --- Modal Logic ---
 export function openModal(modalEl) {
     if (!modalEl) return;
     modalEl.style.display = 'flex';
@@ -30,7 +61,9 @@ export function closeModal(modalEl) {
     setTimeout(() => { modalEl.style.display = 'none'; }, 300);
 }
 
-// --- General UI Setup ---
+// =========================================
+// MAIN UI SETUP BINDINGS
+// =========================================
 export function setupUI() {
     attachUISounds();
 
@@ -48,28 +81,62 @@ export function setupUI() {
     // Nav Listeners
     const accountNavBtn = document.getElementById('accountNavBtn');
     const authModal = document.getElementById('authModal');
+    
     const changeAvatarNavBtn = document.getElementById('changeAvatarNavBtn');
     const avatarModal = document.getElementById('avatarModal');
+    
+    const settingsNavBtn = document.getElementById('settingsNavBtn');
+    const settingsModal = document.getElementById('settingsModal');
+    
     const userPill = document.getElementById('userPill');
     const userDropdown = document.getElementById('userDropdown');
 
+    // Modals Click Handlers
     accountNavBtn?.addEventListener('click', e => { e.preventDefault(); openModal(authModal); });
     document.getElementById('closeModalBtn')?.addEventListener('click', () => closeModal(authModal));
+    
     changeAvatarNavBtn?.addEventListener('click', e => { e.preventDefault(); openModal(avatarModal); });
     document.getElementById('closeAvatarModalBtn')?.addEventListener('click', () => closeModal(avatarModal));
+    
+    settingsNavBtn?.addEventListener('click', e => { e.preventDefault(); openModal(settingsModal); });
+    document.getElementById('closeSettingsModalBtn')?.addEventListener('click', () => closeModal(settingsModal));
 
+    // Outside Click closer
     window.addEventListener('click', event => {
         if (event.target === authModal) closeModal(authModal);
         if (event.target === avatarModal) closeModal(avatarModal);
+        if (event.target === settingsModal) closeModal(settingsModal);
+        
         if (userDropdown?.classList.contains('show') && !userPill?.contains(event.target)) {
             userDropdown.classList.remove('show');
             userPill?.classList.remove('active');
         }
     });
 
+    // Dropdown Toggler
     userPill?.addEventListener('click', e => {
         e.stopPropagation();
         userDropdown?.classList.toggle('show');
         userPill.classList.toggle('active');
+    });
+
+    // Save Settings Event
+    document.getElementById('settingsForm')?.addEventListener('submit', e => {
+        e.preventDefault();
+        const saveBtn = document.getElementById('saveSettingsBtn');
+        saveBtn.innerText = "Saved!";
+        
+        // Save to browser cache exactly like a permanent cookie
+        localStorage.setItem('sv_theme', document.getElementById('themeSelect').value);
+        localStorage.setItem('sv_font', document.getElementById('fontSelect').value);
+        localStorage.setItem('sv_anim', document.getElementById('animSelect').value);
+        
+        // Push the changes to the UI immediately
+        applyPreferences();
+        
+        setTimeout(() => {
+            saveBtn.innerText = "Save Preferences";
+            closeModal(settingsModal);
+        }, 800); // Close after a tiny delay so they see the "Saved!" text
     });
 }

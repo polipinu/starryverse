@@ -3,25 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Starryverse | Create Your Ultimate Web Game</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>The Starryverse</title>
+    
+    <link rel="icon" type="image/png" href="assets/logo.png">
+
+    <!-- UPDATED: Added Lato, Open Sans, and Nunito fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Nunito:wght@400;600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Link to the new main CSS file -->
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 
     <div class="top-banner">
-        <i class="fa-solid fa-triangle-exclamation"></i> This is a work in progress currently - Editor and Playable games coming soon!
+        <i class="fa-solid fa-triangle-exclamation"></i> This is a work in progress currently - Editor and Playable games coming soon! - Join the Discord server for updates! <i class="fa-solid fa-triangle-exclamation"></i>
     </div>
 
     <nav class="navbar-wrapper">
         <div class="navbar-pill">
+            
             <div class="logo">
-                <a href="#">
-                    <!-- Swapped SVG for the new PNG Logo -->
-                    <img src="assets/logo.png" alt="Starryverse Logo" style="height: 40px; width: auto; object-fit: contain;">
+                <a href="#" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+                    <img src="assets/logo.png" alt="Starryverse Logo" style="height: 32px; width: auto; object-fit: contain;">
+                    <!-- UPDATED: Changed logo text to Lato -->
+                    <span style="font-family: 'Lato', sans-serif; font-weight: 900; font-size: 22px; color: var(--text-main);">Starryverse</span>
                 </a>
             </div>
 
@@ -38,12 +43,18 @@
                 <a href="https://discord.gg/dsRQDsfGx7" target="_blank" class="nav-link">
                     <i class="fa-brands fa-discord" style="margin-right: 6px;"></i> Discord
                 </a>
-                <a href="#" class="nav-link" id="accountNavBtn">
-                    <i class="fa-solid fa-user-plus" style="margin-right: 6px;"></i> Account
-                </a>
             </div>
 
             <div class="user-group">
+                <!-- NEW: Settings Gear Icon -->
+                <a href="#" class="nav-link" id="settingsNavBtn" style="padding: 0 10px; font-size: 18px;">
+                    <i class="fa-solid fa-gear"></i>
+                </a>
+
+                <a href="#" class="btn-pill btn-secondary" id="accountNavBtn" style="padding: 6px 16px; font-size: 14px;">
+                    <i class="fa-solid fa-user-plus" style="margin-right: 6px;"></i> Account
+                </a>
+
                 <div id="gemsPill" class="gems-pill-ui" style="display: none; align-items: center; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); padding: 4px 12px 4px 4px; border-radius: 50px; font-weight: 700; font-size: 14px;">
                     <img src="assets/gem.png" alt="Gems" style="width: 28px; height: 28px; object-fit: contain; flex-shrink: 0;">
                     <span id="gemCountDisplay">0</span>
@@ -69,7 +80,7 @@
         <div class="hero-bg"></div>
         <section class="container hero fade-in-up">
             <div class="hero-content">
-                <div class="badge-pill">v1.0 Rebrand</div>
+                <div class="badge-pill">Build: v1.0.4</div>
                 <h1>Build the <span>Starryverse</span></h1>
                 <p>Unleash your creativity with our powerful web-based game editor. Build, customize, and share unique survival worlds with a global community.</p>
                 <div class="btn-group">
@@ -239,17 +250,20 @@
     <div class="modal-overlay" id="authModal">
         <div class="modal-content-pill">
             <button class="close-btn" id="closeModalBtn">&times;</button>
-            <h2 class="modal-title" id="authTitle">Welcome Back</h2>
-            <div class="auth-options">
-                <button class="social-pill btn-google" id="googleAuthBtn"><i class="fa-brands fa-google"></i> Continue with Google</button>
-            </div>
-            <div class="divider"><span>OR</span></div>
-            <form class="auth-form" id="authForm">
+            <h2 class="modal-title" id="authTitle" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fa-solid fa-user-lock" style="color: var(--primary);"></i> Welcome Back
+            </h2>
+            
+            <form class="auth-form" id="authForm" style="margin-top: 25px;">
                 <input type="text" id="authUsername" placeholder="Username (Max 12 chars)" style="display: none;" maxlength="12">
                 <input type="email" id="authEmail" placeholder="Email Address" required>
                 <input type="password" id="authPassword" placeholder="Password" required>
-                <button type="submit" class="btn-pill btn-primary full-width" style="margin-top: 10px;" id="authSubmitBtn">Sign In</button>
-                <div class="auth-toggle">
+                
+                <button type="submit" class="btn-pill btn-primary full-width" style="margin-top: 15px; padding: 14px; font-size: 16px;" id="authSubmitBtn">
+                    Sign In
+                </button>
+                
+                <div class="auth-toggle" style="margin-top: 20px;">
                     <a href="#" id="authToggleText">Need an account? Register</a>
                 </div>
             </form>
@@ -289,7 +303,48 @@
         </div>
     </div>
 
-    <!-- Link to the new main JS file -->
+    <!-- NEW: Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-content-pill">
+            <button class="close-btn" id="closeSettingsModalBtn">&times;</button>
+            <h2 class="modal-title" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fa-solid fa-gear" style="color: var(--primary);"></i> Settings
+            </h2>
+            
+            <form id="settingsForm" style="margin-top: 20px; text-align: left;">
+                
+                <label style="font-size: 14px; font-weight: 700; color: var(--text-muted);">Theme Color</label>
+                <select id="themeSelect" class="settings-select">
+                    <option value="dynamic">Dynamic (System Default)</option>
+                    <option value="light">Classic Light</option>
+                    <option value="dark">Deep Dark</option>
+                    <option value="red">Ruby Red</option>
+                    <option value="green">Emerald Green</option>
+                    <option value="cyan">Neon Cyan</option>
+                    <option value="pink">Hot Pink</option>
+                </select>
+
+                <label style="font-size: 14px; font-weight: 700; color: var(--text-muted); margin-top: 15px; display: block;">Typography</label>
+                <select id="fontSelect" class="settings-select">
+                    <option value="lato">Lato (Default)</option>
+                    <option value="opensans">Open Sans</option>
+                    <option value="nunito">Nunito</option>
+                    <option value="segoe">Segoe UI (Windows System)</option>
+                </select>
+
+                <label style="font-size: 14px; font-weight: 700; color: var(--text-muted); margin-top: 15px; display: block;">Interface Animations</label>
+                <select id="animSelect" class="settings-select">
+                    <option value="on">On (Default)</option>
+                    <option value="off">Off (Performance Mode)</option>
+                </select>
+
+                <button type="submit" class="btn-pill btn-primary full-width" style="margin-top: 25px; padding: 14px; font-size: 16px;" id="saveSettingsBtn">
+                    Save Preferences
+                </button>
+            </form>
+        </div>
+    </div>
+
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

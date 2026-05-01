@@ -49,13 +49,7 @@
     gap: 20px;
     flex: 1;
     justify-content: center;
-    overflow-x: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-.nav-links::-webkit-scrollbar {
-    display: none;
+    /* Removed overflow properties so the hover animation isn't clipped! */
 }
 
 .svg-text {
