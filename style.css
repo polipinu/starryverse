@@ -114,18 +114,12 @@ a {
     fill: var(--text-main);
 }
 
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
 .nav-link {
     display: flex;
     align-items: center;
     color: var(--text-muted);
     font-weight: 600;
-    font-size: 14px; /* Slightly smaller to fit icons nicely */
+    font-size: 14px; 
     transition: all 0.2s;
 }
 
@@ -143,33 +137,11 @@ a {
     transform: scale(1.1);
 }
 
-
 .user-group {
     display: flex;
     align-items: center;
     gap: 10px;
     flex-shrink: 0;
-}
-
-
-.gems-pill-ui {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    padding: 4px 12px 4px 4px;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--text-main);
-}
-
-.gems-pill-ui img {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    object-fit: contain;
 }
 
 /* User Pill & Dropdown Styling */
@@ -237,7 +209,6 @@ a {
     transform: translateY(0);
 }
 
-/* Updated Dropdown Links */
 .dropdown-link {
     display: flex;
     align-items: center;
@@ -357,7 +328,6 @@ a {
     gap: 15px;
 }
 
-/* FIXED IMAGE SIZE */
 .hero-image-pill {
     border-radius: 24px;
     overflow: hidden;
@@ -600,7 +570,6 @@ a {
     position: relative;
 }
 
-/* Fixed Input Styling */
 .auth-form input {
     width: 100%;
     padding: 14px 16px;
@@ -633,7 +602,6 @@ a {
     color: var(--primary-hover);
 }
 
-/* Avatar Selection Grid */
 .avatar-grid {
     display: flex;
     gap: 12px;
@@ -683,4 +651,113 @@ a {
     .navbar-pill { padding: 10px 15px; justify-content: space-between; }
     .nav-links { gap: 10px; }
     .nav-links .nav-link { display: none; } 
+}
+
+
+/* ========================================= */
+/* MODD.IO STYLE GAME GRID SECTION           */
+/* ========================================= */
+
+.games-showcase {
+    padding: 20px 20px 80px 20px;
+}
+
+.games-grid {
+    display: grid;
+    /* Responsive grid, fits 3 nicely on desktop just like Modd.io rows */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 20px;
+}
+
+.game-card {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.game-img-wrapper {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9; /* Perfect thumbnail ratio */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.game-card:hover .game-img-wrapper {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px var(--accent-glow);
+}
+
+.game-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.player-count {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: #e11d48; /* Red pill similar to Modd.io */
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.player-count i {
+    font-size: 10px;
+}
+
+.game-info {
+    padding: 12px 4px 0 4px;
+}
+
+.game-info h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 2px;
+    transition: color 0.2s;
+}
+
+.game-card:hover .game-info h3 {
+    color: var(--primary);
+}
+
+/* Hover Expansion Details */
+.game-extra {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin-top 0.3s ease;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.game-card:hover .game-extra {
+    max-height: 60px; /* Allows the div to physically expand */
+    opacity: 1;
+    margin-top: 6px;
+}
+
+.game-extra p {
+    margin: 3px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.game-extra p i {
+    font-size: 12px;
+    opacity: 0.7;
 }
